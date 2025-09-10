@@ -1,20 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   webserv.hpp                                        :+:      :+:    :+:   */
+/*   error.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/22 10:51:54 by emgul            #+#    #+#              */
+/*   Created: 2025/09/10 11:04:46 by emgul            #+#    #+#              */
 /*   Updated: 2025/09/10 11:25:22 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
-
+#include <cerrno>
+#include <cstring>
 #include <iostream>
+#include <string>
 
-#define PORT 8080
-#define BACKLOG 42
+void log_error(const std::string &context)
+{
+    int e;
 
-void log_error(const std::string &context);
+    e = errno;
+    std::cerr << "[RaRe Server][ERROR] " << context << " | errno=" << e << " (" << std::strerror(e) << ")" << std::endl;
+}
