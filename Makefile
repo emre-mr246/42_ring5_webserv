@@ -4,10 +4,10 @@ CXX         = c++
 CXXFLAGS    = -Wall -Wextra -Werror -std=c++98
 RM          = rm -rf
 
-SRCS        = main.cpp error.cpp client.cpp socket.cpp
+SRCS        = main.cpp error.cpp utils.cpp poll_manager.cpp connection_handler.cpp event_loop.cpp socket.cpp
 HDRS        = webserv.hpp
 
-vpath %.cpp src src/protocols
+vpath %.cpp src
 vpath %.hpp inc
 
 all: $(NAME)
