@@ -4,7 +4,7 @@ CXX         = c++
 CXXFLAGS    = -Wall -Wextra -Werror -std=c++98
 RM          = rm -rf
 
-SRCS        = main.cpp error.cpp
+SRCS        = main.cpp error.cpp client.cpp socket.cpp
 HDRS        = webserv.hpp
 
 vpath %.cpp src src/protocols
