@@ -6,12 +6,13 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 10:51:54 by emgul            #+#    #+#              */
-/*   Updated: 2025/09/14 12:04:10 by emgul            ###   ########.fr       */
+/*   Updated: 2025/09/14 12:34:46 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#include "config.hpp"
 #include <arpa/inet.h>
 #include <cerrno>
 #include <cstring>
