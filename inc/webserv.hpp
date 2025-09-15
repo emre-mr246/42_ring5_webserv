@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 10:51:54 by emgul            #+#    #+#              */
-/*   Updated: 2025/09/15 14:30:46 by emgul            ###   ########.fr       */
+/*   Updated: 2025/09/15 14:55:12 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@
 
 #define PORT 8080
 #define BACKLOG 42
+#define DEBUG_MODE 1
 
 void printError(const std::string &context);
 
@@ -49,5 +50,7 @@ size_t strlcpy(char *dst, const char *src, size_t dstsize);
 std::string strtrim(const std::string &str);
 long strtol(const char *ptr, char **endptr);
 int isspace(int c);
+
+void debug(const Config &serverConfig);
 
 void eventLoop(int server_fd);

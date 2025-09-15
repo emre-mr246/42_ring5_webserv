@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 21:32:43 by emgul            #+#    #+#              */
-/*   Updated: 2025/09/15 14:30:46 by emgul            ###   ########.fr       */
+/*   Updated: 2025/09/15 14:55:12 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,3 +58,4 @@ class Config
 };
 
 void parserConfig(std::ifstream &configFile, std::vector<ServerConfig> &serverConfigs);
+void printConfig(const Config &serverConfig);

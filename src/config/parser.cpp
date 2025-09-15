@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 22:14:28 by emgul            #+#    #+#              */
-/*   Updated: 2025/09/15 14:30:46 by emgul            ###   ########.fr       */
+/*   Updated: 2025/09/15 14:55:12 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,19 @@ static int parsePort(const std::string &s)
     return (static_cast<int>(val));
 }
 
+static int parseBodySize(const std::string &s)
+{
+    char *endptr = NULL;
+    long val = 0;
+
+    if (s.empty())
+        return (0);
+    val = strtol(s.c_str(), &endptr);
+    if (endptr == s.c_str() || val < 0)
+        return (0);
+    return (static_cast<int>(val));
+}
+
 static std::string extractListenValue(const std::string &line)
 {
     std::string value;
@@ -53,6 +66,25 @@ static std::string extractListenValue(const std::string &line)
     if (!value.empty() && value[value.length() - 1] == ';')
         value.resize(value.length() - 1);
     return (strtrim(value));
+}
+
+static int extractBodySize(const std::string &line)
+{
+    std::string value;
+    size_t pos;
+    int bodySize;
+
+    pos = line.find("client_max_body_size");
+    if (pos == std::string::npos)
+        return (1048576);
+    value = strtrim(line.substr(pos + 20));
+    if (!value.empty() && value[value.length() - 1] == ';')
+        value.resize(value.length() - 1);
+    value = strtrim(value);
+    bodySize = parseBodySize(value);
+    if (bodySize > 0)
+        return (bodySize);
+    return (1048576);
 }
 
 static void addListenAddress(const std::string &value, ServerConfig &server)
@@ -94,7 +126,7 @@ static void parseServerDirective(const std::string &line, ServerConfig &server)
         addListenAddress(value, server);
     }
     else if (trimmed.find("client_max_body_size") == 0)
-        server.client_max_body_size = 1048576;
+        server.client_max_body_size = extractBodySize(line);
 }
 
 static int isComment(const std::string &line)
