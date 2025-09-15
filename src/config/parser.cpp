@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 22:14:28 by emgul            #+#    #+#              */
-/*   Updated: 2025/09/15 14:55:12 by emgul            ###   ########.fr       */
+/*   Updated: 2025/09/15 15:22:19 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,71 @@ static void addListenAddress(const std::string &value, ServerConfig &server)
     }
 }
 
+static std::string extractErrorPageValue(const std::string &line)
+{
+    std::string value;
+    size_t pos;
+
+    pos = line.find("error_page");
+    if (pos == std::string::npos)
+        return ("");
+    value = strtrim(line.substr(pos + 10));
+    if (!value.empty() && value[value.length() - 1] == ';')
+        value.resize(value.length() - 1);
+    return (strtrim(value));
+}
+
+static void parseErrorCodes(const std::string &codes, const std::string &path, ServerConfig &server)
+{
+    std::string codeStr;
+    int code;
+    size_t start;
+    size_t end;
+
+    start = 0;
+    end = 0;
+    while (end != std::string::npos)
+    {
+        end = codes.find(' ', start);
+        if (end == std::string::npos)
+            codeStr = codes.substr(start);
+        else
+            codeStr = codes.substr(start, end - start);
+        codeStr = strtrim(codeStr);
+        if (!codeStr.empty())
+        {
+            code = parseBodySize(codeStr);
+            if (code > 0)
+                server.error_pages[code] = path;
+        }
+        start = end + 1;
+    }
+}
+
+static void addErrorPages(const std::string &value, ServerConfig &server)
+{
+    size_t spacePos;
+    std::string codes;
+    std::string path;
+
+    if (value.empty())
+        return;
+    spacePos = value.find_last_of(' ');
+    if (spacePos == std::string::npos)
+        return;
+    codes = strtrim(value.substr(0, spacePos));
+    path = strtrim(value.substr(spacePos + 1));
+    parseErrorCodes(codes, path, server);
+}
+
+static void parseErrorPage(const std::string &line, ServerConfig &server)
+{
+    std::string value;
+
+    value = extractErrorPageValue(line);
+    addErrorPages(value, server);
+}
+
 static void parseServerDirective(const std::string &line, ServerConfig &server)
 {
     std::string trimmed;
@@ -127,6 +192,8 @@ static void parseServerDirective(const std::string &line, ServerConfig &server)
     }
     else if (trimmed.find("client_max_body_size") == 0)
         server.client_max_body_size = extractBodySize(line);
+    else if (trimmed.find("error_page") == 0)
+        parseErrorPage(line, server);
 }
 
 static int isComment(const std::string &line)

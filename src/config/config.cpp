@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 21:07:50 by emgul            #+#    #+#              */
-/*   Updated: 2025/09/15 14:55:12 by emgul            ###   ########.fr       */
+/*   Updated: 2025/09/15 15:22:19 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,9 @@ void printConfig(const Config &serverConfig)
 {
     std::vector<ServerConfig>::const_iterator it;
     std::vector<std::pair<std::string, int> >::const_iterator listen_it;
+    std::map<int, std::string>::const_iterator error_it;
 
+    std::cout << "----------------------------------------" << std::endl;
     it = serverConfig.getServerConfigs().begin();
     while (it != serverConfig.getServerConfigs().end())
     {
@@ -72,6 +74,14 @@ void printConfig(const Config &serverConfig)
         }
         std::cout << std::endl;
         std::cout << "[CONFIG] Client max body size: " << it->client_max_body_size << " bytes" << std::endl;
+
+        error_it = it->error_pages.begin();
+        while (error_it != it->error_pages.end())
+        {
+            std::cout << "[CONFIG] Error page " << error_it->first << ": " << error_it->second << std::endl;
+            error_it++;
+        }
+        std::cout << "----------------------------------------" << std::endl;
         it++;
     }
 }
