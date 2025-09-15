@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   connection_handler.cpp                             :+:      :+:    :+:   */
+/*   connectionHandler.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:12:19 by emgul            #+#    #+#              */
-/*   Updated: 2025/09/14 12:34:46 by emgul            ###   ########.fr       */
+/*   Updated: 2025/09/15 14:30:46 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-int accept_client_connection(int server_fd)
+int acceptClientConnection(int server_fd)
 {
     int client_fd;
 
@@ -21,24 +21,24 @@ int accept_client_connection(int server_fd)
     {
         if (errno == EAGAIN || errno == EWOULDBLOCK)
             return (-1);
-        print_error("accept()");
+        printError("accept()");
         return (-1);
     }
     return (client_fd);
 }
 
-void handle_new_connection(std::vector<struct pollfd> &pollfds, int server_fd)
+void handleNewConnection(std::vector<struct pollfd> &pollfds, int server_fd)
 {
     int client_fd;
 
-    client_fd = accept_client_connection(server_fd);
+    client_fd = acceptClientConnection(server_fd);
     if (client_fd == -1)
         return;
     std::cout << "[RaRe Server] client " << client_fd << " connected" << std::endl;
-    add_client_to_poll(pollfds, client_fd);
+    addClientToPoll(pollfds, client_fd);
 }
 
-int read_from_client(int client_fd)
+int readFromClient(int client_fd)
 {
     char buf[4096];
     ssize_t bytes_read;
@@ -59,20 +59,20 @@ int read_from_client(int client_fd)
     }
     if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)
         return (1);
-    print_error("read()");
+    printError("read()");
     return (0);
 }
 
-int handle_client_data(std::vector<struct pollfd> &pollfds, size_t i)
+int handleClientData(std::vector<struct pollfd> &pollfds, size_t i)
 {
     int client_fd;
 
     client_fd = pollfds[i].fd;
-    if (!read_from_client(client_fd))
+    if (!readFromClient(client_fd))
     {
         std::cout << "[RaRe Server] client " << client_fd << " disconnected" << std::endl;
         close(client_fd);
-        remove_client_from_poll(pollfds, i);
+        removeClientFromPoll(pollfds, i);
         return (0);
     }
     return (1);

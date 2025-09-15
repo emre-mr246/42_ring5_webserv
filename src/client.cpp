@@ -6,13 +6,13 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:12:19 by emgul            #+#    #+#              */
-/*   Updated: 2025/09/14 12:34:46 by emgul            ###   ########.fr       */
+/*   Updated: 2025/09/15 14:30:46 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-int accept_client(int server_fd)
+int acceptClient(int server_fd)
 {
     int client_fd;
     int flags;
@@ -22,7 +22,7 @@ int accept_client(int server_fd)
     {
         if (errno == EAGAIN || errno == EWOULDBLOCK)
             return (-1);
-        print_error("accept()");
+        printError("accept()");
         return (-1);
     }
     flags = fcntl(client_fd, F_GETFL, 0);
@@ -31,22 +31,7 @@ int accept_client(int server_fd)
     return (client_fd);
 }
 
-int accept_client(int server_fd)
-{
-    int client_fd;
-
-    client_fd = accept(server_fd, NULL, NULL);
-    if (client_fd == -1)
-    {
-        if (errno == EAGAIN || errno == EWOULDBLOCK)
-            return (-1);
-        print_error("accept()");
-        return (-1);
-    }
-    return (client_fd);
-}
-
-void read_and_print_client(int client_fd)
+void readAndPrintClient(int client_fd)
 {
     char buf[4096];
     ssize_t n;
@@ -71,12 +56,12 @@ void read_and_print_client(int client_fd)
             continue;
         if (errno == EAGAIN || errno == EWOULDBLOCK)
             break;
-        print_error("read(client)");
+        printError("read(client)");
         break;
     }
 }
 
-int read_client_data(int client_fd)
+int readClientData(int client_fd)
 {
     char buf[4096];
     ssize_t n;
@@ -97,6 +82,6 @@ int read_client_data(int client_fd)
     }
     if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)
         return (1);
-    print_error("read(client)");
+    printError("read(client)");
     return (0);
 }

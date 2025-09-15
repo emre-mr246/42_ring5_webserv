@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   event_loop.cpp                                     :+:      :+:    :+:   */
+/*   eventLoop.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:15:47 by emgul            #+#    #+#              */
-/*   Updated: 2025/09/14 12:34:46 by emgul            ###   ########.fr       */
+/*   Updated: 2025/09/15 14:30:46 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-static void process_events(std::vector<struct pollfd> &pollfds, int server_fd)
+static void processEvents(std::vector<struct pollfd> &pollfds, int server_fd)
 {
     size_t i;
 
@@ -22,10 +22,10 @@ static void process_events(std::vector<struct pollfd> &pollfds, int server_fd)
         if (pollfds[i].revents & POLLIN)
         {
             if (pollfds[i].fd == server_fd)
-                handle_new_connection(pollfds, server_fd);
+                handleNewConnection(pollfds, server_fd);
             else
             {
-                if (!handle_client_data(pollfds, i))
+                if (!handleClientData(pollfds, i))
                     i--;
             }
         }
@@ -34,14 +34,16 @@ static void process_events(std::vector<struct pollfd> &pollfds, int server_fd)
     }
 }
 
-void event_loop(int server_fd)
+void eventLoop(int server_fd)
 {
     std::vector<struct pollfd> pollfds;
 
-    init_poll_server(pollfds, server_fd);
+    std::cout << "[INFO] Creating server..." << std::endl;
+    initPollServer(pollfds, server_fd);
+    std::cout << "[SERVER] Ready to accept connections." << std::endl;
     while (1)
     {
-        if (wait_for_events(pollfds) > 0)
-            process_events(pollfds, server_fd);
+        if (waitForEvents(pollfds) > 0)
+            processEvents(pollfds, server_fd);
     }
 }

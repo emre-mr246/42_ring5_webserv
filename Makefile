@@ -1,10 +1,10 @@
 NAME        = webserv
 
 CXX         = c++
-CXXFLAGS    = -Wall -Wextra -Werror -std=c++98 -pedantic
+CXXFLAGS    = -Wall -Wextra -Werror -std=c++98 -pedantic -g
 RM          = rm -rf
 
-SRCS        = main.cpp error.cpp utils.cpp poll_manager.cpp connection_handler.cpp event_loop.cpp socket.cpp config.cpp
+SRCS        = main.cpp error.cpp parser.cpp utils.cpp pollManager.cpp connectionHandler.cpp eventLoop.cpp socket.cpp config.cpp
 HDRS        = webserv.hpp
 
 vpath %.cpp src src/config

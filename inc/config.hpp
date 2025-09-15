@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 21:32:43 by emgul            #+#    #+#              */
-/*   Updated: 2025/09/14 12:34:46 by emgul            ###   ########.fr       */
+/*   Updated: 2025/09/15 14:30:46 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ struct ServerConfig
 {
     ServerConfig() : client_max_body_size(1048576) {}
 
-    std::vector<std::pair<std::string, int>> listen_on;
+    std::vector<std::pair<std::string, int> > listen_on;
     std::map<int, std::string> error_pages;
     size_t client_max_body_size;
     std::vector<LocationConfig> locations;
@@ -56,3 +56,5 @@ class Config
     int loadConfig(const std::string &filePath);
     const std::vector<ServerConfig> &getServerConfigs() const;
 };
+
+void parserConfig(std::ifstream &configFile, std::vector<ServerConfig> &serverConfigs);
