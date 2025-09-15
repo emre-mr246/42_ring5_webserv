@@ -1,35 +1,48 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   parserUtils.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/22 10:51:54 by emgul            #+#    #+#              */
+/*   Created: 2025/09/15 17:05:30 by emgul            #+#    #+#              */
 /*   Updated: 2025/09/15 17:05:30 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-int main(int argc, char **argv)
+int isComment(const std::string &line)
 {
-    int serverFd;
-    Config serverConfig;
+    size_t i;
 
-    if (argc != 2)
+    i = 0;
+    while (i < line.length())
     {
-        std::cerr << "Usage: " << argv[0] << " <configuration file>" << std::endl;
-        return (1);
+        if (!isspace(line[i]))
+        {
+            if (line[i] == '#')
+                return (1);
+            else
+                return (0);
+        }
+        i++;
     }
-    if (!serverConfig.loadConfig(argv[1]))
-        return (1);
-    if (DEBUG_MODE)
-        debug(serverConfig);
-    serverFd = createListeningSocket();
-    if (serverFd == -1)
-        return (1);
-    eventLoop(serverFd);
-    close(serverFd);
     return (0);
+}
+
+bool isServerBlock(const std::string &line)
+{
+    std::string trimmed;
+
+    trimmed = strtrim(line);
+    return (trimmed == "server" || trimmed == "server {");
+}
+
+bool isLocationBlock(const std::string &line)
+{
+    std::string trimmed;
+
+    trimmed = strtrim(line);
+    return (trimmed.find("location") == 0);
 }

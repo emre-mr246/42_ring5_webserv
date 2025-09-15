@@ -6,27 +6,11 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 22:14:28 by emgul            #+#    #+#              */
-/*   Updated: 2025/09/15 15:22:19 by emgul            ###   ########.fr       */
+/*   Updated: 2025/09/15 17:05:30 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
-
-static bool isServerBlock(const std::string &line)
-{
-    std::string trimmed;
-
-    trimmed = strtrim(line);
-    return (trimmed == "server" || trimmed == "server {");
-}
-
-static bool isLocationBlock(const std::string &line)
-{
-    std::string trimmed;
-
-    trimmed = strtrim(line);
-    return (trimmed.find("location") == 0);
-}
 
 static int parsePort(const std::string &s)
 {
@@ -39,52 +23,6 @@ static int parsePort(const std::string &s)
     if (endptr == s.c_str() || val <= 0 || val > 65535)
         return (0);
     return (static_cast<int>(val));
-}
-
-static int parseBodySize(const std::string &s)
-{
-    char *endptr = NULL;
-    long val = 0;
-
-    if (s.empty())
-        return (0);
-    val = strtol(s.c_str(), &endptr);
-    if (endptr == s.c_str() || val < 0)
-        return (0);
-    return (static_cast<int>(val));
-}
-
-static std::string extractListenValue(const std::string &line)
-{
-    std::string value;
-    size_t pos = 0;
-
-    pos = line.find("listen");
-    if (pos == std::string::npos)
-        return ("");
-    value = strtrim(line.substr(pos + 6));
-    if (!value.empty() && value[value.length() - 1] == ';')
-        value.resize(value.length() - 1);
-    return (strtrim(value));
-}
-
-static int extractBodySize(const std::string &line)
-{
-    std::string value;
-    size_t pos;
-    int bodySize;
-
-    pos = line.find("client_max_body_size");
-    if (pos == std::string::npos)
-        return (1048576);
-    value = strtrim(line.substr(pos + 20));
-    if (!value.empty() && value[value.length() - 1] == ';')
-        value.resize(value.length() - 1);
-    value = strtrim(value);
-    bodySize = parseBodySize(value);
-    if (bodySize > 0)
-        return (bodySize);
-    return (1048576);
 }
 
 static void addListenAddress(const std::string &value, ServerConfig &server)
@@ -114,18 +52,17 @@ static void addListenAddress(const std::string &value, ServerConfig &server)
     }
 }
 
-static std::string extractErrorPageValue(const std::string &line)
+int parseBodySize(const std::string &s)
 {
-    std::string value;
-    size_t pos;
+    char *endptr = NULL;
+    long val = 0;
 
-    pos = line.find("error_page");
-    if (pos == std::string::npos)
-        return ("");
-    value = strtrim(line.substr(pos + 10));
-    if (!value.empty() && value[value.length() - 1] == ';')
-        value.resize(value.length() - 1);
-    return (strtrim(value));
+    if (s.empty())
+        return (0);
+    val = strtol(s.c_str(), &endptr);
+    if (endptr == s.c_str() || val < 0)
+        return (0);
+    return (static_cast<int>(val));
 }
 
 static void parseErrorCodes(const std::string &codes, const std::string &path, ServerConfig &server)
@@ -171,14 +108,6 @@ static void addErrorPages(const std::string &value, ServerConfig &server)
     parseErrorCodes(codes, path, server);
 }
 
-static void parseErrorPage(const std::string &line, ServerConfig &server)
-{
-    std::string value;
-
-    value = extractErrorPageValue(line);
-    addErrorPages(value, server);
-}
-
 static void parseServerDirective(const std::string &line, ServerConfig &server)
 {
     std::string trimmed;
@@ -193,26 +122,7 @@ static void parseServerDirective(const std::string &line, ServerConfig &server)
     else if (trimmed.find("client_max_body_size") == 0)
         server.client_max_body_size = extractBodySize(line);
     else if (trimmed.find("error_page") == 0)
-        parseErrorPage(line, server);
-}
-
-static int isComment(const std::string &line)
-{
-    size_t i;
-
-    i = 0;
-    while (i < line.length())
-    {
-        if (!isspace(line[i]))
-        {
-            if (line[i] == '#')
-                return (1);
-            else
-                return (0);
-        }
-        i++;
-    }
-    return (0);
+        addErrorPages(extractErrorPageValue(line), server);
 }
 
 static void updateServerBlockState(const std::string &line, int &depth, ServerConfig &current, std::vector<ServerConfig> &all)
