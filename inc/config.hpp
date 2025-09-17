@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 21:32:43 by emgul            #+#    #+#              */
-/*   Updated: 2025/09/15 17:05:30 by emgul            ###   ########.fr       */
+/*   Updated: 2025/09/17 14:53:08 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,6 @@
 
 struct LocationConfig
 {
-    LocationConfig() : autoindex(false) {}
-
     std::string path;
     std::string root;
     std::string index_file;
@@ -29,13 +27,12 @@ struct LocationConfig
     std::vector<std::string> accepted_methods;
     std::pair<int, std::string> redirect;
     std::string upload_path;
+    size_t client_max_body_size;
     std::pair<std::string, std::string> cgi_pass;
 };
 
 struct ServerConfig
 {
-    ServerConfig() : client_max_body_size(1048576) {}
-
     std::vector<std::pair<std::string, int> > listen_on;
     std::map<int, std::string> error_pages;
     size_t client_max_body_size;
@@ -66,3 +63,6 @@ std::string extractErrorPageValue(const std::string &line);
 std::string extractListenValue(const std::string &line);
 int extractBodySize(const std::string &line);
 int parseBodySize(const std::string &s);
+std::string extractLocationPath(const std::string &line);
+std::vector<std::string> extractAcceptedMethods(const std::string &line);
+void printConfig(const Config &serverConfig);

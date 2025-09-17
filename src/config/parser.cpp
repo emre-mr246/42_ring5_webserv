@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 22:14:28 by emgul            #+#    #+#              */
-/*   Updated: 2025/09/15 17:05:30 by emgul            ###   ########.fr       */
+/*   Updated: 2025/09/17 14:53:08 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,17 @@ static void addErrorPages(const std::string &value, ServerConfig &server)
     parseErrorCodes(codes, path, server);
 }
 
+static void parseLocationDirective(const std::string &line, LocationConfig &location)
+{
+    std::string trimmed;
+
+    trimmed = strtrim(line);
+    if (trimmed.find("client_max_body_size") == 0)
+        location.client_max_body_size = extractBodySize(line);
+    else if (trimmed.find("accepted_methods") == 0)
+        location.accepted_methods = extractAcceptedMethods(line);
+}
+
 static void parseServerDirective(const std::string &line, ServerConfig &server)
 {
     std::string trimmed;
@@ -125,7 +136,7 @@ static void parseServerDirective(const std::string &line, ServerConfig &server)
         addErrorPages(extractErrorPageValue(line), server);
 }
 
-static void updateServerBlockState(const std::string &line, int &depth, ServerConfig &current, std::vector<ServerConfig> &all)
+static void updateServerBlockState(const std::string &line, int &depth, ServerConfig &current, std::vector<ServerConfig> &all, LocationConfig &currentLocation, bool &inLocation)
 {
     if (isServerBlock(line))
     {
@@ -133,23 +144,48 @@ static void updateServerBlockState(const std::string &line, int &depth, ServerCo
             all.push_back(current);
         current = ServerConfig();
         depth = 0;
+        inLocation = false;
     }
+    else if (isLocationBlock(line) && depth > 0)
+    {
+        if (inLocation)
+            current.locations.push_back(currentLocation);
+        currentLocation = LocationConfig();
+        currentLocation.path = extractLocationPath(line);
+        inLocation = true;
+    }
+
     if (line.find("{") != std::string::npos && depth >= 0)
         depth++;
     if (line.find("}") != std::string::npos && depth >= 0)
     {
         depth--;
-        if (depth == 0)
+        if (depth == 1 && inLocation)
+        {
+            current.locations.push_back(currentLocation);
+            inLocation = false;
+        }
+        else if (depth == 0)
         {
             all.push_back(current);
             depth = -1;
+            inLocation = false;
         }
     }
 }
 
-static int isValidServerDirective(const std::string &line, int depth)
+static int isValidLocationDirective(const std::string &line, int depth, bool inLocation)
 {
-    if (depth < 0)
+    if (depth < 1 || !inLocation)
+        return (0);
+    if (isServerBlock(line) || isLocationBlock(line))
+        return (0);
+    return (1);
+}
+
+static int isValidServerDirective(const std::string &line, int depth, bool inLocation)
+{
+    if (depth < 0 || inLocation)
         return (0);
     if (isServerBlock(line) || isLocationBlock(line))
         return (0);
@@ -158,22 +194,30 @@ static int isValidServerDirective(const std::string &line, int depth)
 
 void parserConfig(std::ifstream &configFile, std::vector<ServerConfig> &serverConfigs)
 {
-
     int blockDepth;
     std::string line;
     ServerConfig currentServer;
+    LocationConfig currentLocation;
+    bool inLocation;
 
     blockDepth = -1;
+    inLocation = false;
     serverConfigs.clear();
     while (std::getline(configFile, line))
     {
         line = strtrim(line);
         if (line.empty() || isComment(line))
             continue;
-        updateServerBlockState(line, blockDepth, currentServer, serverConfigs);
-        if (isValidServerDirective(line, blockDepth))
+        updateServerBlockState(line, blockDepth, currentServer, serverConfigs, currentLocation, inLocation);
+        if (isValidServerDirective(line, blockDepth, inLocation))
             parseServerDirective(line, currentServer);
+        else if (isValidLocationDirective(line, blockDepth, inLocation))
+            parseLocationDirective(line, currentLocation);
     }
     if (blockDepth >= 0)
+    {
+        if (inLocation)
+            currentServer.locations.push_back(currentLocation);
         serverConfigs.push_back(currentServer);
+    }
 }
