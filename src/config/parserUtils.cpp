@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:05:30 by emgul            #+#    #+#              */
-/*   Updated: 2025/09/17 14:53:08 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/04 02:14:25 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,4 +45,37 @@ bool isLocationBlock(const std::string &line)
 
     trimmed = strtrim(line);
     return (trimmed.find("location") == 0);
+}
+
+int parsePort(const std::string &s)
+{
+    char *endptr = NULL;
+    long val = 0;
+
+    if (s.empty())
+        return (0);
+    val = strtol(s.c_str(), &endptr);
+    if (endptr == s.c_str() || val <= 0 || val > 65535)
+        return (0);
+    return (static_cast<int>(val));
+}
+
+int parseBodySize(const std::string &s)
+{
+    char *endptr = NULL;
+    long val = 0;
+    long multiplier = 1;
+
+    if (s.empty())
+        return (0);
+    val = strtol(s.c_str(), &endptr);
+    if (endptr == s.c_str() || val < 0)
+        return (0);
+    if (*endptr == 'k' || *endptr == 'K')
+        multiplier = 1024;
+    else if (*endptr == 'm' || *endptr == 'M')
+        multiplier = 1024 * 1024;
+    else if (*endptr == 'g' || *endptr == 'G')
+        multiplier = 1024 * 1024 * 1024;
+    return (static_cast<int>(val * multiplier));
 }

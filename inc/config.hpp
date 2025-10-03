@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 21:32:43 by emgul            #+#    #+#              */
-/*   Updated: 2025/09/17 14:53:08 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/04 02:14:26 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,19 @@ std::string extractErrorPageValue(const std::string &line);
 std::string extractListenValue(const std::string &line);
 int extractBodySize(const std::string &line);
 int parseBodySize(const std::string &s);
+int parsePort(const std::string &s);
+void addListenAddress(const std::string &value, ServerConfig &server);
+void addErrorPages(const std::string &value, ServerConfig &server);
+void parseLocationDirective(const std::string &line, LocationConfig &location);
+void parseServerDirective(const std::string &line, ServerConfig &server);
+int isValidLocationDirective(const std::string &line, int depth, bool inLocation);
+int isValidServerDirective(const std::string &line, int depth, bool inLocation);
 std::string extractLocationPath(const std::string &line);
 std::vector<std::string> extractAcceptedMethods(const std::string &line);
+std::string extractRoot(const std::string &line);
+std::string extractIndex(const std::string &line);
+bool extractAutoindex(const std::string &line);
+std::string extractUploadPath(const std::string &line);
+std::pair<int, std::string> extractRedirect(const std::string &line);
+std::pair<std::string, std::string> extractCgiPass(const std::string &line);
 void printConfig(const Config &serverConfig);

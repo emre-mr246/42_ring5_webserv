@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   locationExtract.cpp                                :+:      :+:    :+:   */
+/*   location.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 14:49:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/09/17 14:53:08 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/04 02:14:25 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,31 +29,45 @@ std::string extractLocationPath(const std::string &line)
     return (value);
 }
 
-std::vector<std::string> extractAcceptedMethods(const std::string &line)
+std::string extractRoot(const std::string &line)
 {
-    size_t pos;
-    size_t start;
-    size_t end;
     std::string value;
-    std::string method;
-    std::vector<std::string> methods;
+    size_t pos;
 
-    pos = line.find("accepted_methods");
+    pos = line.find("root");
     if (pos == std::string::npos)
-        return (methods);
-    value = strtrim(line.substr(pos + 16));
+        return ("");
+    value = strtrim(line.substr(pos + 4));
     if (!value.empty() && value[value.length() - 1] == ';')
-        value = value.substr(0, value.length() - 1);
-    start = 0;
-    while (start < value.length())
-    {
-        end = value.find(' ', start);
-        if (end == std::string::npos)
-            end = value.length();
-        method = strtrim(value.substr(start, end - start));
-        if (!method.empty())
-            methods.push_back(method);
-        start = end + 1;
-    }
-    return (methods);
+        value.resize(value.length() - 1);
+    return (strtrim(value));
+}
+
+std::string extractIndex(const std::string &line)
+{
+    std::string value;
+    size_t pos;
+
+    pos = line.find("index");
+    if (pos == std::string::npos)
+        return ("");
+    value = strtrim(line.substr(pos + 5));
+    if (!value.empty() && value[value.length() - 1] == ';')
+        value.resize(value.length() - 1);
+    return (strtrim(value));
+}
+
+bool extractAutoindex(const std::string &line)
+{
+    std::string value;
+    size_t pos;
+
+    pos = line.find("autoindex");
+    if (pos == std::string::npos)
+        return (false);
+    value = strtrim(line.substr(pos + 9));
+    if (!value.empty() && value[value.length() - 1] == ';')
+        value.resize(value.length() - 1);
+    value = strtrim(value);
+    return (value == "on");
 }
