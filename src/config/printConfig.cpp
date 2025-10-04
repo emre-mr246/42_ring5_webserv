@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 14:49:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/04 02:14:25 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/04 02:28:46 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,10 +44,10 @@ static void printAcceptedMethods(const std::vector<std::string> &accepted_method
 
     if (accepted_methods.empty())
     {
-        std::cout << "[CONFIG] Accepted methods: (none specified)" << std::endl;
+        std::cout << "[CONFIG]   Accepted methods: (none specified)" << std::endl;
         return;
     }
-    std::cout << "[CONFIG] Accepted methods: ";
+    std::cout << "[CONFIG]   Accepted methods: ";
     it = accepted_methods.begin();
     while (it != accepted_methods.end())
     {
@@ -69,6 +69,17 @@ static void printLocations(const std::vector<LocationConfig> &locations)
         std::cout << "[CONFIG] Location path: " << it->path << std::endl;
         std::cout << "[CONFIG]   Client max body size: " << (it->client_max_body_size + 1023) / 1024 << " KB" << std::endl;
         printAcceptedMethods(it->accepted_methods);
+        if (!it->root.empty())
+            std::cout << "[CONFIG]   Root: " << it->root << std::endl;
+        if (!it->index_file.empty())
+            std::cout << "[CONFIG]   Index: " << it->index_file << std::endl;
+        std::cout << "[CONFIG]   Autoindex: " << (it->autoindex ? "on" : "off") << std::endl;
+        if (!it->upload_path.empty())
+            std::cout << "[CONFIG]   Upload path: " << it->upload_path << std::endl;
+        if (it->redirect.first != 0)
+            std::cout << "[CONFIG]   Redirect: " << it->redirect.first << " " << it->redirect.second << std::endl;
+        if (!it->cgi_pass.first.empty())
+            std::cout << "[CONFIG]   CGI pass: " << it->cgi_pass.first << " -> " << it->cgi_pass.second << std::endl;
         it++;
     }
 }
@@ -86,5 +97,7 @@ void printConfig(const Config &serverConfig)
         printErrorPages(it->error_pages);
         printLocations(it->locations);
         it++;
+        if (it != serverConfig.getServerConfigs().end())
+            std::cout << std::endl;
     }
 }

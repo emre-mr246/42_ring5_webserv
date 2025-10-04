@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 22:14:28 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/04 02:14:25 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/04 02:28:46 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,14 @@ static void handleBraceDepth(const std::string &line, int &depth, ServerConfig &
     }
 }
 
+static void initLocation(LocationConfig &loc, const std::string &line)
+{
+    loc = LocationConfig();
+    loc.path = extractLocationPath(line);
+    loc.client_max_body_size = 1048576;
+    loc.autoindex = false;
+}
+
 static void updateServerBlockState(const std::string &line, int &depth, ServerConfig &current, std::vector<ServerConfig> &all, LocationConfig &currentLocation, bool &inLocation)
 {
     if (isServerBlock(line))
@@ -40,6 +48,7 @@ static void updateServerBlockState(const std::string &line, int &depth, ServerCo
         if (depth >= 0)
             all.push_back(current);
         current = ServerConfig();
+        current.client_max_body_size = 1048576;
         depth = 0;
         inLocation = false;
     }
@@ -47,8 +56,7 @@ static void updateServerBlockState(const std::string &line, int &depth, ServerCo
     {
         if (inLocation)
             current.locations.push_back(currentLocation);
-        currentLocation = LocationConfig();
-        currentLocation.path = extractLocationPath(line);
+        initLocation(currentLocation, line);
         inLocation = true;
     }
     handleBraceDepth(line, depth, current, all, currentLocation, inLocation);
@@ -72,6 +80,9 @@ void parserConfig(std::ifstream &configFile, std::vector<ServerConfig> &serverCo
     ServerConfig currentServer;
     LocationConfig currentLocation;
 
+    currentServer.client_max_body_size = 1048576;
+    currentLocation.client_max_body_size = 1048576;
+    currentLocation.autoindex = false;
     serverConfigs.clear();
     while (std::getline(configFile, line))
     {

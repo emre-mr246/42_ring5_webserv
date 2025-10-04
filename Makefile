@@ -4,7 +4,7 @@ CXX         = c++
 CXXFLAGS    = -Wall -Wextra -Werror -std=c++98 -pedantic -g
 RM          = rm -rf
 
-SRCS        = main.cpp error.cpp serverExtract.cpp printConfig.cpp locationExtract.cpp parserUtils.cpp debug.cpp parser.cpp utils.cpp pollManager.cpp connectionHandler.cpp eventLoop.cpp socket.cpp config.cpp
+SRCS        = main.cpp error.cpp serverExtract.cpp printConfig.cpp location.cpp location2.cpp parserUtils.cpp parserAddressError.cpp parser2.cpp debug.cpp parser.cpp utils.cpp pollManager.cpp connectionHandler.cpp eventLoop.cpp socket.cpp config.cpp
 HDRS        = webserv.hpp
 
 vpath %.cpp src src/config src/debug
