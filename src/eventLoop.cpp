@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:15:47 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/04 13:21:54 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/04 21:29:35 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,7 @@ void eventLoop(int server_fd)
 {
     std::vector<struct pollfd> pollfds;
 
-    std::cout << "[INFO] Creating server..." << std::endl;
     initPollServer(pollfds, server_fd);
-    std::cout << "[SERVER] Ready to accept connections." << std::endl;
     while (1)
     {
         if (waitForEvents(pollfds) > 0)

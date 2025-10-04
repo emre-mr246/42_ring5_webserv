@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 10:51:54 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/04 13:21:54 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/04 21:29:35 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,6 @@ int main(int argc, char **argv)
     }
     if (!serverConfig.loadConfig(argv[1]))
         return (1);
-    if (DEBUG_MODE)
-        debug(serverConfig);
     serverFd = createListeningSocket();
     if (serverFd == -1)
         return (1);

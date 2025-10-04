@@ -6,10 +6,11 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:12:19 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/04 13:21:54 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/04 21:29:35 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "http.hpp"
 #include "webserv.hpp"
 
 int acceptClientConnection(int server_fd)
@@ -34,8 +35,19 @@ void handleNewConnection(std::vector<struct pollfd> &pollfds, int server_fd)
     client_fd = acceptClientConnection(server_fd);
     if (client_fd == -1)
         return;
-    std::cout << "[RaRe Server] client " << client_fd << " connected" << std::endl;
     addClientToPoll(pollfds, client_fd);
+}
+
+static void parseAndDisplayRequest(const char *buf, ssize_t bytes_read)
+{
+    HttpRequest req;
+    std::string data;
+
+    data = std::string(buf, bytes_read);
+    req.is_complete = false;
+    req.bytes_received = 0;
+    processRequestData(buf, bytes_read, req);
+    printHttpRequest(req);
 }
 
 int readFromClient(int client_fd)
@@ -46,17 +58,11 @@ int readFromClient(int client_fd)
     bytes_read = read(client_fd, buf, sizeof(buf));
     if (bytes_read > 0)
     {
-        std::cout << "[client " << client_fd << "] ";
-        std::cout.write(buf, bytes_read);
-        if (buf[bytes_read - 1] == '\n')
-            std::cout.flush();
+        parseAndDisplayRequest(buf, bytes_read);
         return (1);
     }
     if (bytes_read == 0)
-    {
-        std::cout.flush();
         return (0);
-    }
     if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)
         return (1);
     printError("read()");
@@ -70,7 +76,6 @@ int handleClientData(std::vector<struct pollfd> &pollfds, size_t i)
     client_fd = pollfds[i].fd;
     if (!readFromClient(client_fd))
     {
-        std::cout << "[RaRe Server] client " << client_fd << " disconnected" << std::endl;
         close(client_fd);
         removeClientFromPoll(pollfds, i);
         return (0);

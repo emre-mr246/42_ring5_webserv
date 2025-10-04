@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:15:47 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/04 13:21:54 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/04 21:29:35 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,6 @@ int createListeningSocket()
 {
     int fd;
 
-    std::cout << "[INFO] Creating server socket..." << std::endl;
     fd = createSocket();
     if (fd == -1)
         return (-1);
@@ -102,5 +101,6 @@ int createListeningSocket()
         close(fd);
         return (-1);
     }
+    std::cout << "Server listening on port " << PORT << " (fd: " << fd << ")" << std::endl;
     return (fd);
 }
