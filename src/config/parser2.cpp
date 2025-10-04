@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 22:14:28 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/04 02:28:46 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/04 13:21:54 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,8 @@ void parseServerDirective(const std::string &line, ServerConfig &server)
         value = extractListenValue(line);
         addListenAddress(value, server);
     }
+    else if (trimmed.find("server_name") == 0)
+        server.server_names = extractServerNames(line);
     else if (trimmed.find("client_max_body_size") == 0)
         server.client_max_body_size = extractBodySize(line);
     else if (trimmed.find("error_page") == 0)

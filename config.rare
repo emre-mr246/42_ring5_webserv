@@ -3,7 +3,8 @@
 server {
     listen 8080;
     listen 127.0.0.1:8081;
-    
+    server_name localhost hisarsec.com www.hisarsec.com;
+
     client_max_body_size 1048576;
     
     error_page 404 /error_pages/404.html;
@@ -40,7 +41,8 @@ server {
 server {
     listen 0.0.0.0:80;
     listen [::]:80;
-    
+    server_name intra.hisarsec.com api.hisarsec.com;
+
     client_max_body_size 2097152;
     
     error_page 403 /errors/403.html;

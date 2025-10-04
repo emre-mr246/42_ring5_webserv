@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 21:32:43 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/04 02:28:46 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/04 13:21:54 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,18 @@ struct LocationConfig
 struct ServerConfig
 {
     std::vector<std::pair<std::string, int> > listen_on;
+    std::vector<std::string> server_names;
     std::map<int, std::string> error_pages;
     size_t client_max_body_size;
     std::vector<LocationConfig> locations;
+};
+
+struct configData
+{
+    int depth;
+    bool inLocation;
+    ServerConfig currentServer;
+    LocationConfig currentLocation;
 };
 
 class Config
@@ -78,4 +87,7 @@ bool extractAutoindex(const std::string &line);
 std::string extractUploadPath(const std::string &line);
 std::pair<int, std::string> extractRedirect(const std::string &line);
 std::pair<std::string, std::string> extractCgiPass(const std::string &line);
+std::vector<std::string> extractServerNames(const std::string &line);
+int validateServerConfig(const ServerConfig &server);
+int validateAllServers(const std::vector<ServerConfig> &servers);
 void printConfig(const Config &serverConfig);

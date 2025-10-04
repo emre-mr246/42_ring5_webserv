@@ -6,30 +6,35 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 22:14:28 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/04 02:28:46 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/04 13:21:54 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-static void handleBraceDepth(const std::string &line, int &depth, ServerConfig &current, std::vector<ServerConfig> &all, LocationConfig &currentLocation, bool &inLocation)
+static void handleClosingBrace(configData &state, std::vector<ServerConfig> &all)
 {
-    if (line.find("{") != std::string::npos && depth >= 0)
-        depth++;
-    if (line.find("}") != std::string::npos && depth >= 0)
+    if (state.depth == 1 && state.inLocation)
     {
-        depth--;
-        if (depth == 1 && inLocation)
-        {
-            current.locations.push_back(currentLocation);
-            inLocation = false;
-        }
-        else if (depth == 0)
-        {
-            all.push_back(current);
-            depth = -1;
-            inLocation = false;
-        }
+        state.currentServer.locations.push_back(state.currentLocation);
+        state.inLocation = false;
+    }
+    else if (state.depth == 0)
+    {
+        all.push_back(state.currentServer);
+        state.depth = -1;
+        state.inLocation = false;
+    }
+}
+
+static void handleBraceDepth(const std::string &line, configData &state, std::vector<ServerConfig> &all)
+{
+    if (line.find("{") != std::string::npos && state.depth >= 0)
+        state.depth++;
+    if (line.find("}") != std::string::npos && state.depth >= 0)
+    {
+        state.depth--;
+        handleClosingBrace(state, all);
     }
 }
 
@@ -39,61 +44,64 @@ static void initLocation(LocationConfig &loc, const std::string &line)
     loc.path = extractLocationPath(line);
     loc.client_max_body_size = 1048576;
     loc.autoindex = false;
+    loc.index_file = "index.html";
+    loc.accepted_methods.push_back("GET");
 }
 
-static void updateServerBlockState(const std::string &line, int &depth, ServerConfig &current, std::vector<ServerConfig> &all, LocationConfig &currentLocation, bool &inLocation)
+static void updateServerBlockState(const std::string &line, configData &state, std::vector<ServerConfig> &all)
 {
     if (isServerBlock(line))
     {
-        if (depth >= 0)
-            all.push_back(current);
-        current = ServerConfig();
-        current.client_max_body_size = 1048576;
-        depth = 0;
-        inLocation = false;
+        if (state.depth >= 0)
+            all.push_back(state.currentServer);
+        state.currentServer = ServerConfig();
+        state.currentServer.client_max_body_size = 1048576;
+        state.depth = 0;
+        state.inLocation = false;
     }
-    else if (isLocationBlock(line) && depth > 0)
+    else if (isLocationBlock(line) && state.depth > 0)
     {
-        if (inLocation)
-            current.locations.push_back(currentLocation);
-        initLocation(currentLocation, line);
-        inLocation = true;
+        if (state.inLocation)
+            state.currentServer.locations.push_back(state.currentLocation);
+        initLocation(state.currentLocation, line);
+        state.inLocation = true;
     }
-    handleBraceDepth(line, depth, current, all, currentLocation, inLocation);
+    handleBraceDepth(line, state, all);
 }
 
-static void finalizeConfig(int depth, bool inLocation, ServerConfig &current, LocationConfig &currentLocation, std::vector<ServerConfig> &all)
+static void finalizeConfig(configData &state, std::vector<ServerConfig> &all)
 {
-    if (depth >= 0)
+    if (state.depth >= 0)
     {
-        if (inLocation)
-            current.locations.push_back(currentLocation);
-        all.push_back(current);
+        if (state.inLocation)
+            state.currentServer.locations.push_back(state.currentLocation);
+        all.push_back(state.currentServer);
     }
 }
 
 void parserConfig(std::ifstream &configFile, std::vector<ServerConfig> &serverConfigs)
 {
-    int blockDepth = -1;
-    bool inLocation = false;
+    configData state;
     std::string line;
-    ServerConfig currentServer;
-    LocationConfig currentLocation;
 
-    currentServer.client_max_body_size = 1048576;
-    currentLocation.client_max_body_size = 1048576;
-    currentLocation.autoindex = false;
+    state.depth = -1;
+    state.inLocation = false;
+    state.currentServer.client_max_body_size = 1048576;
+    state.currentLocation.client_max_body_size = 1048576;
+    state.currentLocation.autoindex = false;
+    state.currentLocation.index_file = "index.html";
+    state.currentLocation.accepted_methods.push_back("GET");
     serverConfigs.clear();
     while (std::getline(configFile, line))
     {
         line = strtrim(line);
         if (line.empty() || isComment(line))
             continue;
-        updateServerBlockState(line, blockDepth, currentServer, serverConfigs, currentLocation, inLocation);
-        if (isValidServerDirective(line, blockDepth, inLocation))
-            parseServerDirective(line, currentServer);
-        else if (isValidLocationDirective(line, blockDepth, inLocation))
-            parseLocationDirective(line, currentLocation);
+        updateServerBlockState(line, state, serverConfigs);
+        if (isValidServerDirective(line, state.depth, state.inLocation))
+            parseServerDirective(line, state.currentServer);
+        else if (isValidLocationDirective(line, state.depth, state.inLocation))
+            parseLocationDirective(line, state.currentLocation);
     }
-    finalizeConfig(blockDepth, inLocation, currentServer, currentLocation, serverConfigs);
+    finalizeConfig(state, serverConfigs);
 }

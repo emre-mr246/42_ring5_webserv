@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 14:49:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/04 02:28:46 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/04 13:21:54 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,24 @@ static void printListenAddresses(const std::vector<std::pair<std::string, int> >
     {
         std::cout << it->first << ":" << it->second << " ";
         it++;
+    }
+    std::cout << std::endl;
+}
+
+static void printServerNames(const std::vector<std::string> &server_names)
+{
+    std::vector<std::string>::const_iterator it;
+
+    if (server_names.empty())
+        return;
+    std::cout << "[CONFIG] Server names: ";
+    it = server_names.begin();
+    while (it != server_names.end())
+    {
+        std::cout << *it;
+        it++;
+        if (it != server_names.end())
+            std::cout << ", ";
     }
     std::cout << std::endl;
 }
@@ -93,6 +111,7 @@ void printConfig(const Config &serverConfig)
     {
         std::cout << "[Server " << (it - serverConfig.getServerConfigs().begin() + 1) << "] ------------------------------" << std::endl;
         printListenAddresses(it->listen_on);
+        printServerNames(it->server_names);
         std::cout << "[CONFIG] Client max body size: " << (it->client_max_body_size + 1023) / 1024 << " KB" << std::endl;
         printErrorPages(it->error_pages);
         printLocations(it->locations);

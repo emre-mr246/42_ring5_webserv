@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 21:07:50 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/04 02:28:46 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/04 13:21:54 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,11 @@ int Config::loadConfig(const std::string &filePath)
     }
     if (readConfigFile(filePath, serverConfigs) == 0)
         return (0);
+    if (validateAllServers(serverConfigs))
+    {
+        std::cerr << "[ERROR] Configuration validation failed." << std::endl;
+        return (0);
+    }
     return (1);
 }
 
