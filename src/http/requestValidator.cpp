@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   headerParser.cpp                                   :+:      :+:    :+:   */
+/*   requestValidator.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -13,39 +13,42 @@
 #include "http.hpp"
 #include "webserv.hpp"
 
-static int extractHeaderName(const std::string &line, std::string &name)
+static int isValidMethod(const std::string &method)
 {
-    size_t pos;
+    if (method == "GET")
+        return (1);
+    if (method == "POST")
+        return (1);
+    if (method == "DELETE")
+        return (1);
+    return (0);
+}
 
-    pos = line.find(':');
-    if (pos == std::string::npos)
+static int isValidVersion(const std::string &version)
+{
+    if (version.find("HTTP/1.1") != std::string::npos)
+        return (1);
+    if (version.find("HTTP/1.0") != std::string::npos)
+        return (1);
+    return (0);
+}
+
+static int isValidUri(const std::string &uri)
+{
+    if (uri.empty())
         return (0);
-    name = line.substr(0, pos);
+    if (uri[0] != '/')
+        return (0);
     return (1);
 }
 
-static std::string extractHeaderValue(const std::string &line)
+int validateHttpRequest(const HttpRequest &req)
 {
-    size_t pos;
-    std::string value;
-
-    pos = line.find(':');
-    if (pos == std::string::npos)
-        return ("");
-    value = line.substr(pos + 1);
-    return (strtrim(value));
-}
-
-int parseHeader(const std::string &line, HttpRequest &req)
-{
-    std::string name;
-    std::string value;
-
-    if (line.empty())
-        return (1);
-    if (!extractHeaderName(line, name))
+    if (!isValidMethod(req.method))
         return (0);
-    value = extractHeaderValue(line);
-    req.headers[name] = value;
+    if (!isValidUri(req.uri))
+        return (0);
+    if (!isValidVersion(req.version))
+        return (0);
     return (1);
 }

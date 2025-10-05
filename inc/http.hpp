@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:36 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/04 21:29:36 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/05 13:39:50 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,6 @@ struct HttpRequest
     std::string version;
     std::map<std::string, std::string> headers;
     std::string body;
-    bool is_complete;
-    size_t bytes_received;
 };
 
 struct HttpResponse
@@ -41,3 +39,6 @@ int processRequestData(const char *data, size_t len, HttpRequest &req);
 std::string buildHttpResponse(HttpResponse &res);
 HttpResponse serveStaticFile(const std::string &path);
 void printHttpRequest(const HttpRequest &req);
+std::string decodeChunkedBody(const std::string &body);
+int validateHttpRequest(const HttpRequest &req);
+HttpResponse createErrorResponse(int status_code);

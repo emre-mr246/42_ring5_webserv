@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   responseBuilder.cpp                                :+:      :+:    :+:   */
+/*   errorResponse.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -13,51 +13,38 @@
 #include "http.hpp"
 #include <sstream>
 
-static std::string getStatusMessage(int code)
+static std::string getErrorMessage(int code)
 {
-    if (code == 200)
-        return ("OK");
+    if (code == 400)
+        return ("Bad Request");
     if (code == 404)
         return ("Not Found");
+    if (code == 405)
+        return ("Method Not Allowed");
     if (code == 500)
         return ("Internal Server Error");
-    if (code == 403)
-        return ("Forbidden");
-    return ("Unknown");
+    return ("Error");
 }
 
-static std::string buildStatusLine(const HttpResponse &res)
+static std::string buildErrorBody(int code, const std::string &message)
 {
     std::ostringstream oss;
 
-    oss << "HTTP/1.1 " << res.status_code << " ";
-    oss << res.status_message << "\r\n";
+    oss << "<html><head><title>" << code << " " << message << "</title></head>";
+    oss << "<body><h1>" << code << " " << message << "</h1></body></html>";
     return (oss.str());
 }
 
-static std::string buildHeaders(const HttpResponse &res)
+HttpResponse createErrorResponse(int status_code)
 {
-    std::ostringstream oss;
-    std::map<std::string, std::string>::const_iterator it;
-
-    it = res.headers.begin();
-    while (it != res.headers.end())
-    {
-        oss << it->first << ": " << it->second << "\r\n";
-        it++;
-    }
-    oss << "\r\n";
-    return (oss.str());
-}
-
-std::string buildHttpResponse(HttpResponse &res)
-{
+    HttpResponse response;
     std::ostringstream oss;
 
-    if (res.status_message.empty())
-        res.status_message = getStatusMessage(res.status_code);
-    oss << buildStatusLine(res);
-    oss << buildHeaders(res);
-    oss << res.body;
-    return (oss.str());
+    response.status_code = status_code;
+    response.status_message = getErrorMessage(status_code);
+    response.body = buildErrorBody(status_code, response.status_message);
+    oss << response.body.length();
+    response.headers["Content-Length"] = oss.str();
+    response.headers["Content-Type"] = "text/html";
+    return (response);
 }
