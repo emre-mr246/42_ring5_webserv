@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:35 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 11:18:27 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 12:59:58 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,11 @@ int processRequestData(const char *data, size_t len, HttpRequest &req)
 {
     std::vector<std::string> lines;
     size_t i;
+    size_t max_size;
 
+    max_size = 1048576;
+    if (len > max_size)
+        return (0);
     extractLines(data, len, lines);
     if (lines.empty())
         return (0);

@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:35 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 11:18:27 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 12:59:58 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,20 @@ static std::string extractHeaderValue(const std::string &line)
     return (strtrim(value));
 }
 
+static int isHeaderSizeValid(const std::string &name, const std::string &value)
+{
+    size_t max_name_len;
+    size_t max_value_len;
+
+    max_name_len = 256;
+    max_value_len = 8192;
+    if (name.length() > max_name_len)
+        return (0);
+    if (value.length() > max_value_len)
+        return (0);
+    return (1);
+}
+
 int parseHeader(const std::string &line, HttpRequest &req)
 {
     std::string name;
@@ -46,6 +60,8 @@ int parseHeader(const std::string &line, HttpRequest &req)
     if (!extractHeaderName(line, name))
         return (0);
     value = extractHeaderValue(line);
+    if (!isHeaderSizeValid(name, value))
+        return (0);
     req.headers[name] = value;
     return (1);
 }

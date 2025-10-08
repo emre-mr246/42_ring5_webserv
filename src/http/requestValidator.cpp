@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:35 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 11:18:27 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 12:59:58 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,11 +33,29 @@ static int isValidVersion(const std::string &version)
     return (0);
 }
 
+static int hasNullByte(const std::string &uri)
+{
+    size_t i;
+
+    i = 0;
+    while (i < uri.length())
+    {
+        if (uri[i] == '\0')
+            return (1);
+        i++;
+    }
+    return (0);
+}
+
 static int isValidUri(const std::string &uri)
 {
     if (uri.empty())
         return (0);
     if (uri[0] != '/')
+        return (0);
+    if (uri.length() > 2048)
+        return (0);
+    if (hasNullByte(uri))
         return (0);
     return (1);
 }

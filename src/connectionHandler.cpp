@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:12:19 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 11:18:27 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 12:59:58 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,16 @@ static void handleRequest(const HttpRequest &req, int client_fd)
 static void parseAndHandleRequest(const char *buf, ssize_t bytes_read, int client_fd)
 {
     HttpRequest req;
+    HttpResponse response;
+    std::string response_str;
 
-    processRequestData(buf, bytes_read, req);
+    if (!processRequestData(buf, bytes_read, req))
+    {
+        response = createErrorResponse(413);
+        response_str = buildHttpResponse(response);
+        sendResponseToClient(client_fd, response_str);
+        return;
+    }
     printHttpRequest(req);
     handleRequest(req, client_fd);
 }
