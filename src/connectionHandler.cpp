@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:12:19 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/05 13:39:50 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 11:18:27 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,12 +38,28 @@ void handleNewConnection(std::vector<struct pollfd> &pollfds, int server_fd)
     addClientToPoll(pollfds, client_fd);
 }
 
-static void parseAndDisplayRequest(const char *buf, ssize_t bytes_read)
+static void handleRequest(const HttpRequest &req, int client_fd)
+{
+    HttpResponse response;
+    std::string response_str;
+
+    if (!validateHttpRequest(req))
+        response = createErrorResponse(400);
+    else if (req.method == "GET")
+        response = handleGetRequest(req.uri);
+    else
+        response = createErrorResponse(405);
+    response_str = buildHttpResponse(response);
+    sendResponseToClient(client_fd, response_str);
+}
+
+static void parseAndHandleRequest(const char *buf, ssize_t bytes_read, int client_fd)
 {
     HttpRequest req;
 
     processRequestData(buf, bytes_read, req);
     printHttpRequest(req);
+    handleRequest(req, client_fd);
 }
 
 int readFromClient(int client_fd)
@@ -54,7 +70,7 @@ int readFromClient(int client_fd)
     bytes_read = read(client_fd, buf, sizeof(buf));
     if (bytes_read > 0)
     {
-        parseAndDisplayRequest(buf, bytes_read);
+        parseAndHandleRequest(buf, bytes_read, client_fd);
         return (1);
     }
     if (bytes_read == 0)

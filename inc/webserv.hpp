@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 10:51:54 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/05 13:39:50 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 11:18:27 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ int acceptClientConnection(int server_fd);
 void handleNewConnection(std::vector<struct pollfd> &pollfds, int server_fd);
 int readFromClient(int client_fd);
 int handleClientData(std::vector<struct pollfd> &pollfds, size_t client_index);
-int readClientData(int client_fd);
 
 void *memset(void *str, int c, size_t n);
 size_t strlcpy(char *dst, const char *src, size_t dstsize);

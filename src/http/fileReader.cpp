@@ -1,54 +1,56 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   requestValidator.cpp                               :+:      :+:    :+:   */
+/*   fileReader.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/04 21:29:35 by emgul            #+#    #+#              */
+/*   Created: 2025/10/05 13:39:50 by emgul            #+#    #+#              */
 /*   Updated: 2025/10/08 11:18:27 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http.hpp"
 #include "webserv.hpp"
+#include <sys/stat.h>
 
-static int isValidMethod(const std::string &method)
+static int checkFileExists(const std::string &path)
 {
-    if (method == "GET")
-        return (1);
-    if (method == "POST")
-        return (1);
-    if (method == "DELETE")
-        return (1);
-    return (0);
-}
+    struct stat file_info;
 
-static int isValidVersion(const std::string &version)
-{
-    if (version.find("HTTP/1.1") != std::string::npos)
-        return (1);
-    if (version.find("HTTP/1.0") != std::string::npos)
-        return (1);
-    return (0);
-}
-
-static int isValidUri(const std::string &uri)
-{
-    if (uri.empty())
+    if (stat(path.c_str(), &file_info) == -1)
         return (0);
-    if (uri[0] != '/')
+    if (S_ISDIR(file_info.st_mode))
         return (0);
     return (1);
 }
 
-int validateHttpRequest(const HttpRequest &req)
+static std::string readFileContent(int fd)
 {
-    if (!isValidMethod(req.method))
+    std::string content;
+    char buf[4096];
+    ssize_t bytes_read;
+
+    while (1)
+    {
+        bytes_read = read(fd, buf, sizeof(buf));
+        if (bytes_read <= 0)
+            break;
+        content.append(buf, bytes_read);
+    }
+    return (content);
+}
+
+int readFile(const std::string &path, std::string &content)
+{
+    int fd;
+
+    if (!checkFileExists(path))
         return (0);
-    if (!isValidUri(req.uri))
+    fd = open(path.c_str(), O_RDONLY);
+    if (fd == -1)
         return (0);
-    if (!isValidVersion(req.version))
-        return (0);
+    content = readFileContent(fd);
+    close(fd);
     return (1);
 }
