@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/05 13:39:50 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 12:59:58 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 14:45:41 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@ static HttpResponse createSuccessResponse(const std::string &content, const std:
     HttpResponse response;
     std::ostringstream oss;
 
-    response.status_code = 200;
-    response.status_message = "OK";
+    response.statusCode = 200;
+    response.statusMessage = "OK";
     response.body = content;
     oss << content.length();
     response.headers["Content-Length"] = oss.str();
@@ -30,15 +30,15 @@ static HttpResponse createSuccessResponse(const std::string &content, const std:
 
 HttpResponse handleGetRequest(const std::string &uri)
 {
-    std::string file_path;
+    std::string filePath;
     std::string content;
-    std::string mime_type;
+    std::string mimeType;
 
-    file_path = resolveFilePath(uri);
-    if (file_path.empty())
+    filePath = resolveFilePath(uri);
+    if (filePath.empty())
         return (createErrorResponse(403));
-    if (!readFile(file_path, content))
+    if (!readFile(filePath, content))
         return (createErrorResponse(404));
-    mime_type = getMimeType(file_path);
-    return (createSuccessResponse(content, mime_type));
+    mimeType = getMimeType(filePath);
+    return (createSuccessResponse(content, mimeType));
 }

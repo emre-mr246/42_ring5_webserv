@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 13:21:54 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 12:59:58 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 14:45:40 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,12 +28,12 @@ static int checkDuplicateServer(const ServerConfig &s1, const ServerConfig &s2)
     size_t j;
 
     i = 0;
-    while (i < s1.listen_on.size())
+    while (i < s1.listenOn.size())
     {
         j = 0;
-        while (j < s2.listen_on.size())
+        while (j < s2.listenOn.size())
         {
-            if (s1.listen_on[i] == s2.listen_on[j])
+            if (s1.listenOn[i] == s2.listenOn[j])
                 return (1);
             j++;
         }
@@ -46,15 +46,15 @@ int validateServerConfig(const ServerConfig &server)
 {
     size_t i;
 
-    if (server.listen_on.empty())
+    if (server.listenOn.empty())
     {
         std::cerr << "Error: listen directive is required\n";
         return (1);
     }
     i = 0;
-    while (i < server.listen_on.size())
+    while (i < server.listenOn.size())
     {
-        if (validatePort(server.listen_on[i].second))
+        if (validatePort(server.listenOn[i].second))
             return (1);
         i++;
     }

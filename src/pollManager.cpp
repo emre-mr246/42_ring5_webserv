@@ -6,44 +6,44 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:15:47 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 12:59:58 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 14:45:40 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-void initPollServer(std::vector<struct pollfd> &pollfds, int server_fd)
+void initPollServer(std::vector<struct pollfd> &pollFds, int serverFd)
 {
-    struct pollfd server_poll;
+    struct pollfd serverPoll;
 
-    pollfds.clear();
-    server_poll.fd = server_fd;
-    server_poll.events = POLLIN;
-    server_poll.revents = 0;
-    pollfds.push_back(server_poll);
+    pollFds.clear();
+    serverPoll.fd = serverFd;
+    serverPoll.events = POLLIN;
+    serverPoll.revents = 0;
+    pollFds.push_back(serverPoll);
 }
 
-void addClientToPoll(std::vector<struct pollfd> &pollfds, int client_fd)
+void addClientToPoll(std::vector<struct pollfd> &pollFds, int clientFd)
 {
-    struct pollfd client_poll;
+    struct pollfd clientPoll;
 
-    client_poll.fd = client_fd;
-    client_poll.events = POLLIN;
-    client_poll.revents = 0;
-    pollfds.push_back(client_poll);
+    clientPoll.fd = clientFd;
+    clientPoll.events = POLLIN;
+    clientPoll.revents = 0;
+    pollFds.push_back(clientPoll);
 }
 
-void removeClientFromPoll(std::vector<struct pollfd> &pollfds, size_t index)
+void removeClientFromPoll(std::vector<struct pollfd> &pollFds, size_t index)
 {
-    if (index < pollfds.size())
-        pollfds.erase(pollfds.begin() + index);
+    if (index < pollFds.size())
+        pollFds.erase(pollFds.begin() + index);
 }
 
-int waitForEvents(std::vector<struct pollfd> &pollfds)
+int waitForEvents(std::vector<struct pollfd> &pollFds)
 {
     int result;
 
-    result = poll(pollfds.data(), pollfds.size(), -1);
+    result = poll(pollFds.data(), pollFds.size(), -1);
     if (result == -1)
     {
         printError("poll()");

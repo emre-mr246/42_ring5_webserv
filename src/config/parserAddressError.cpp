@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 22:14:28 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 12:59:58 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 14:45:40 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,13 +29,13 @@ void addListenAddress(const std::string &value, ServerConfig &server)
         portStr = strtrim(value.substr(colonPos + 1));
         port = parsePort(portStr);
         if (port > 0)
-            server.listen_on.push_back(std::make_pair(ip, port));
+            server.listenOn.push_back(std::make_pair(ip, port));
     }
     else
     {
         port = parsePort(value);
         if (port > 0)
-            server.listen_on.push_back(std::make_pair(std::string("0.0.0.0"), port));
+            server.listenOn.push_back(std::make_pair(std::string("0.0.0.0"), port));
     }
 }
 
@@ -60,7 +60,7 @@ static void parseErrorCodes(const std::string &codes, const std::string &path, S
         {
             code = parseBodySize(codeStr);
             if (code > 0)
-                server.error_pages[code] = path;
+                server.errorPages[code] = path;
         }
         start = end + 1;
     }

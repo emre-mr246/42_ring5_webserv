@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:35 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 12:59:58 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 14:45:41 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,14 +35,14 @@ static std::string buildErrorBody(int code, const std::string &message)
     return (oss.str());
 }
 
-HttpResponse createErrorResponse(int status_code)
+HttpResponse createErrorResponse(int statusCode)
 {
     HttpResponse response;
     std::ostringstream oss;
 
-    response.status_code = status_code;
-    response.status_message = getErrorMessage(status_code);
-    response.body = buildErrorBody(status_code, response.status_message);
+    response.statusCode = statusCode;
+    response.statusMessage = getErrorMessage(statusCode);
+    response.body = buildErrorBody(statusCode, response.statusMessage);
     oss << response.body.length();
     response.headers["Content-Length"] = oss.str();
     response.headers["Content-Type"] = "text/html";

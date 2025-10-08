@@ -6,28 +6,28 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/05 13:39:50 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 12:59:58 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 14:45:41 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http.hpp"
 #include "webserv.hpp"
 
-int sendResponseToClient(int client_fd, const std::string &response)
+int sendResponseToClient(int clientFd, const std::string &response)
 {
-    ssize_t bytes_sent;
-    size_t total_sent;
+    ssize_t bytesSent;
+    size_t totalSent;
     size_t remaining;
 
-    total_sent = 0;
+    totalSent = 0;
     remaining = response.length();
-    while (total_sent < response.length())
+    while (totalSent < response.length())
     {
-        bytes_sent = write(client_fd, response.c_str() + total_sent, remaining);
-        if (bytes_sent <= 0)
+        bytesSent = write(clientFd, response.c_str() + totalSent, remaining);
+        if (bytesSent <= 0)
             return (0);
-        total_sent = total_sent + bytes_sent;
-        remaining = remaining - bytes_sent;
+        totalSent = totalSent + bytesSent;
+        remaining = remaining - bytesSent;
     }
     return (1);
 }

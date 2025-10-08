@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 22:14:28 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 12:59:58 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 14:45:40 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,21 +18,21 @@ void parseLocationDirective(const std::string &line, LocationConfig &location)
 
     trimmed = strtrim(line);
     if (trimmed.find("client_max_body_size") == 0)
-        location.client_max_body_size = extractBodySize(line);
+        location.clientMaxBodySize = extractBodySize(line);
     else if (trimmed.find("accepted_methods") == 0)
-        location.accepted_methods = extractAcceptedMethods(line);
+        location.acceptedMethods = extractAcceptedMethods(line);
     else if (trimmed.find("root") == 0)
         location.root = extractRoot(line);
     else if (trimmed.find("index") == 0)
-        location.index_file = extractIndex(line);
+        location.indexFile = extractIndex(line);
     else if (trimmed.find("autoindex") == 0)
         location.autoindex = extractAutoindex(line);
     else if (trimmed.find("upload_path") == 0)
-        location.upload_path = extractUploadPath(line);
+        location.uploadPath = extractUploadPath(line);
     else if (trimmed.find("redirect") == 0)
         location.redirect = extractRedirect(line);
     else if (trimmed.find("cgi_pass") == 0)
-        location.cgi_pass = extractCgiPass(line);
+        location.cgiPass = extractCgiPass(line);
 }
 
 void parseServerDirective(const std::string &line, ServerConfig &server)
@@ -47,9 +47,9 @@ void parseServerDirective(const std::string &line, ServerConfig &server)
         addListenAddress(value, server);
     }
     else if (trimmed.find("server_name") == 0)
-        server.server_names = extractServerNames(line);
+        server.serverNames = extractServerNames(line);
     else if (trimmed.find("client_max_body_size") == 0)
-        server.client_max_body_size = extractBodySize(line);
+        server.clientMaxBodySize = extractBodySize(line);
     else if (trimmed.find("error_page") == 0)
         addErrorPages(extractErrorPageValue(line), server);
 }

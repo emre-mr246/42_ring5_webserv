@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 10:51:54 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 12:59:58 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 14:45:41 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,15 +34,15 @@ void printError(const std::string &context);
 
 int createListeningSocket();
 
-void initPollServer(std::vector<struct pollfd> &pollfds, int server_fd);
-void addClientToPoll(std::vector<struct pollfd> &pollfds, int client_fd);
-void removeClientFromPoll(std::vector<struct pollfd> &pollfds, size_t index);
-int waitForEvents(std::vector<struct pollfd> &pollfds);
+void initPollServer(std::vector<struct pollfd> &pollFds, int serverFd);
+void addClientToPoll(std::vector<struct pollfd> &pollFds, int clientFd);
+void removeClientFromPoll(std::vector<struct pollfd> &pollFds, size_t index);
+int waitForEvents(std::vector<struct pollfd> &pollFds);
 
-int acceptClientConnection(int server_fd);
-void handleNewConnection(std::vector<struct pollfd> &pollfds, int server_fd);
-int readFromClient(int client_fd);
-int handleClientData(std::vector<struct pollfd> &pollfds, size_t client_index);
+int acceptClientConnection(int serverFd);
+void handleNewConnection(std::vector<struct pollfd> &pollFds, int serverFd);
+int readFromClient(int clientFd);
+int handleClientData(std::vector<struct pollfd> &pollFds, size_t clientIndex);
 
 void *memset(void *str, int c, size_t n);
 size_t strlcpy(char *dst, const char *src, size_t dstsize);
@@ -52,4 +52,4 @@ int isspace(int c);
 
 void debug(const Config &serverConfig);
 
-void eventLoop(int server_fd);
+void eventLoop(int serverFd);

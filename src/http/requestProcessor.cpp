@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:35 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 12:59:58 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 14:45:41 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,13 +60,13 @@ static int isChunkedEncoding(const HttpRequest &req)
 static void extractBody(const char *data, size_t len, HttpRequest &req)
 {
     std::string buffer;
-    size_t header_end;
+    size_t headerEnd;
 
     buffer = std::string(data, len);
-    header_end = findHeaderEnd(buffer);
-    if (header_end != std::string::npos && header_end < len)
+    headerEnd = findHeaderEnd(buffer);
+    if (headerEnd != std::string::npos && headerEnd < len)
     {
-        req.body = buffer.substr(header_end);
+        req.body = buffer.substr(headerEnd);
         if (isChunkedEncoding(req))
             req.body = decodeChunkedBody(req.body);
     }
@@ -76,10 +76,10 @@ int processRequestData(const char *data, size_t len, HttpRequest &req)
 {
     std::vector<std::string> lines;
     size_t i;
-    size_t max_size;
+    size_t maxSize;
 
-    max_size = 1048576;
-    if (len > max_size)
+    maxSize = 1048576;
+    if (len > maxSize)
         return (0);
     extractLines(data, len, lines);
     if (lines.empty())

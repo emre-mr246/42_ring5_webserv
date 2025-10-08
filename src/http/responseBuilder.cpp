@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:35 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 12:59:58 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 14:45:41 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,8 @@ static std::string buildStatusLine(const HttpResponse &res)
 {
     std::ostringstream oss;
 
-    oss << "HTTP/1.1 " << res.status_code << " ";
-    oss << res.status_message << "\r\n";
+    oss << "HTTP/1.1 " << res.statusCode << " ";
+    oss << res.statusMessage << "\r\n";
     return (oss.str());
 }
 
@@ -54,8 +54,8 @@ std::string buildHttpResponse(HttpResponse &res)
 {
     std::ostringstream oss;
 
-    if (res.status_message.empty())
-        res.status_message = getStatusMessage(res.status_code);
+    if (res.statusMessage.empty())
+        res.statusMessage = getStatusMessage(res.statusCode);
     oss << buildStatusLine(res);
     oss << buildHeaders(res);
     oss << res.body;

@@ -6,82 +6,84 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:12:19 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 12:59:58 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 14:45:40 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http.hpp"
 #include "webserv.hpp"
 
-int acceptClientConnection(int server_fd)
+int acceptClientConnection(int serverFd)
 {
-    int client_fd;
+    int clientFd;
 
-    client_fd = accept(server_fd, NULL, NULL);
-    if (client_fd == -1)
+    clientFd = accept(serverFd, NULL, NULL);
+    if (clientFd == -1)
     {
         if (errno == EAGAIN || errno == EWOULDBLOCK)
             return (-1);
         printError("accept()");
         return (-1);
     }
-    return (client_fd);
+    return (clientFd);
 }
 
-void handleNewConnection(std::vector<struct pollfd> &pollfds, int server_fd)
+void handleNewConnection(std::vector<struct pollfd> &pollFds, int serverFd)
 {
-    int client_fd;
+    int clientFd;
 
-    client_fd = acceptClientConnection(server_fd);
-    if (client_fd == -1)
+    clientFd = acceptClientConnection(serverFd);
+    if (clientFd == -1)
         return;
-    addClientToPoll(pollfds, client_fd);
+    addClientToPoll(pollFds, clientFd);
 }
 
-static void handleRequest(const HttpRequest &req, int client_fd)
+static void handleRequest(const HttpRequest &req, int clientFd)
 {
     HttpResponse response;
-    std::string response_str;
+    std::string responseStr;
 
     if (!validateHttpRequest(req))
         response = createErrorResponse(400);
     else if (req.method == "GET")
         response = handleGetRequest(req.uri);
+    else if (req.method == "POST")
+        response = handlePostRequest(req);
     else
         response = createErrorResponse(405);
-    response_str = buildHttpResponse(response);
-    sendResponseToClient(client_fd, response_str);
+    responseStr = buildHttpResponse(response);
+    sendResponseToClient(clientFd, responseStr);
 }
 
-static void parseAndHandleRequest(const char *buf, ssize_t bytes_read, int client_fd)
+static void parseAndHandleRequest(const char *buf, ssize_t bytesRead, int clientFd)
 {
     HttpRequest req;
     HttpResponse response;
-    std::string response_str;
+    std::string responseStr;
 
-    if (!processRequestData(buf, bytes_read, req))
+    if (!processRequestData(buf, bytesRead, req))
     {
         response = createErrorResponse(413);
-        response_str = buildHttpResponse(response);
-        sendResponseToClient(client_fd, response_str);
+        responseStr = buildHttpResponse(response);
+        sendResponseToClient(clientFd, responseStr);
         return;
     }
     printHttpRequest(req);
-    handleRequest(req, client_fd);
+    handleRequest(req, clientFd);
 }
 
-int readFromClient(int client_fd)
+int readFromClient(int clientFd)
 {
     char buf[4096];
-    ssize_t bytes_read;
+    ssize_t bytesRead;
 
-    bytes_read = read(client_fd, buf, sizeof(buf));
-    if (bytes_read > 0)
+    bytesRead = read(clientFd, buf, sizeof(buf));
+    if (bytesRead > 0)
     {
-        parseAndHandleRequest(buf, bytes_read, client_fd);
+        parseAndHandleRequest(buf, bytesRead, clientFd);
         return (1);
     }
-    if (bytes_read == 0)
+    if (bytesRead == 0)
         return (0);
     if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)
         return (1);
@@ -89,15 +91,15 @@ int readFromClient(int client_fd)
     return (0);
 }
 
-int handleClientData(std::vector<struct pollfd> &pollfds, size_t i)
+int handleClientData(std::vector<struct pollfd> &pollFds, size_t i)
 {
-    int client_fd;
+    int clientFd;
 
-    client_fd = pollfds[i].fd;
-    if (!readFromClient(client_fd))
+    clientFd = pollFds[i].fd;
+    if (!readFromClient(clientFd))
     {
-        close(client_fd);
-        removeClientFromPoll(pollfds, i);
+        close(clientFd);
+        removeClientFromPoll(pollFds, i);
         return (0);
     }
     return (1);

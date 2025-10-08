@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/05 13:39:50 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 12:59:58 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 14:45:41 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,11 @@
 
 static int checkFileExists(const std::string &path)
 {
-    struct stat file_info;
+    struct stat fileInfo;
 
-    if (stat(path.c_str(), &file_info) == -1)
+    if (stat(path.c_str(), &fileInfo) == -1)
         return (0);
-    if (S_ISDIR(file_info.st_mode))
+    if (S_ISDIR(fileInfo.st_mode))
         return (0);
     return (1);
 }
@@ -29,14 +29,14 @@ static std::string readFileContent(int fd)
 {
     std::string content;
     char buf[4096];
-    ssize_t bytes_read;
+    ssize_t bytesRead;
 
     while (1)
     {
-        bytes_read = read(fd, buf, sizeof(buf));
-        if (bytes_read <= 0)
+        bytesRead = read(fd, buf, sizeof(buf));
+        if (bytesRead <= 0)
             break;
-        content.append(buf, bytes_read);
+        content.append(buf, bytesRead);
     }
     return (content);
 }

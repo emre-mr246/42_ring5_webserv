@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:35 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 12:59:58 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 14:45:41 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ std::string decodeChunkedBody(const std::string &body)
 {
     std::string result;
     size_t pos;
-    size_t chunk_size;
+    size_t chunkSize;
     size_t i;
 
     i = 0;
@@ -49,13 +49,13 @@ std::string decodeChunkedBody(const std::string &body)
         pos = body.find('\n', i);
         if (pos == std::string::npos)
             break;
-        chunk_size = parseHexSize(body.substr(i, pos - i));
-        if (chunk_size == 0)
+        chunkSize = parseHexSize(body.substr(i, pos - i));
+        if (chunkSize == 0)
             break;
         i = pos + 1;
-        if (i + chunk_size <= body.length())
-            result.append(body.substr(i, chunk_size));
-        i = i + chunk_size;
+        if (i + chunkSize <= body.length())
+            result.append(body.substr(i, chunkSize));
+        i = i + chunkSize;
         while (i < body.length() && (body[i] == '\r' || body[i] == '\n'))
             i++;
     }

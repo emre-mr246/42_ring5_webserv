@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 22:14:28 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 12:59:58 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 14:45:40 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,10 +42,10 @@ static void initLocation(LocationConfig &loc, const std::string &line)
 {
     loc = LocationConfig();
     loc.path = extractLocationPath(line);
-    loc.client_max_body_size = 1048576;
+    loc.clientMaxBodySize = 1048576;
     loc.autoindex = false;
-    loc.index_file = "index.html";
-    loc.accepted_methods.push_back("GET");
+    loc.indexFile = "index.html";
+    loc.acceptedMethods.push_back("GET");
 }
 
 static void updateServerBlockState(const std::string &line, configData &state, std::vector<ServerConfig> &all)
@@ -55,7 +55,7 @@ static void updateServerBlockState(const std::string &line, configData &state, s
         if (state.depth >= 0)
             all.push_back(state.currentServer);
         state.currentServer = ServerConfig();
-        state.currentServer.client_max_body_size = 1048576;
+        state.currentServer.clientMaxBodySize = 1048576;
         state.depth = 0;
         state.inLocation = false;
     }
@@ -86,11 +86,11 @@ void parserConfig(std::ifstream &configFile, std::vector<ServerConfig> &serverCo
 
     state.depth = -1;
     state.inLocation = false;
-    state.currentServer.client_max_body_size = 1048576;
-    state.currentLocation.client_max_body_size = 1048576;
+    state.currentServer.clientMaxBodySize = 1048576;
+    state.currentLocation.clientMaxBodySize = 1048576;
     state.currentLocation.autoindex = false;
-    state.currentLocation.index_file = "index.html";
-    state.currentLocation.accepted_methods.push_back("GET");
+    state.currentLocation.indexFile = "index.html";
+    state.currentLocation.acceptedMethods.push_back("GET");
     serverConfigs.clear();
     while (std::getline(configFile, line))
     {

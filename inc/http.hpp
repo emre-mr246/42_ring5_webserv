@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:36 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 12:59:58 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 14:45:41 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,8 @@ struct HttpRequest
 
 struct HttpResponse
 {
-    int status_code;
-    std::string status_message;
+    int statusCode;
+    std::string statusMessage;
     std::map<std::string, std::string> headers;
     std::string body;
 };
@@ -40,9 +40,11 @@ std::string buildHttpResponse(HttpResponse &res);
 void printHttpRequest(const HttpRequest &req);
 std::string decodeChunkedBody(const std::string &body);
 int validateHttpRequest(const HttpRequest &req);
-HttpResponse createErrorResponse(int status_code);
-int sendResponseToClient(int client_fd, const std::string &response);
+HttpResponse createErrorResponse(int statusCode);
+int sendResponseToClient(int clientFd, const std::string &response);
 std::string resolveFilePath(const std::string &uri);
 int readFile(const std::string &path, std::string &content);
+int writeFile(const std::string &path, const std::string &content);
 std::string getMimeType(const std::string &path);
 HttpResponse handleGetRequest(const std::string &uri);
+HttpResponse handlePostRequest(const HttpRequest &req);

@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 21:32:43 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 12:59:58 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 14:45:41 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,21 +22,21 @@ struct LocationConfig
 {
     std::string path;
     std::string root;
-    std::string index_file;
+    std::string indexFile;
     bool autoindex;
-    std::vector<std::string> accepted_methods;
+    std::vector<std::string> acceptedMethods;
     std::pair<int, std::string> redirect;
-    std::string upload_path;
-    size_t client_max_body_size;
-    std::pair<std::string, std::string> cgi_pass;
+    std::string uploadPath;
+    size_t clientMaxBodySize;
+    std::pair<std::string, std::string> cgiPass;
 };
 
 struct ServerConfig
 {
-    std::vector<std::pair<std::string, int> > listen_on;
-    std::vector<std::string> server_names;
-    std::map<int, std::string> error_pages;
-    size_t client_max_body_size;
+    std::vector<std::pair<std::string, int> > listenOn;
+    std::vector<std::string> serverNames;
+    std::map<int, std::string> errorPages;
+    size_t clientMaxBodySize;
     std::vector<LocationConfig> locations;
 };
 

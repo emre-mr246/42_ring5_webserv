@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:35 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 12:59:58 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 14:45:41 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,14 +38,14 @@ static std::string extractHeaderValue(const std::string &line)
 
 static int isHeaderSizeValid(const std::string &name, const std::string &value)
 {
-    size_t max_name_len;
-    size_t max_value_len;
+    size_t maxNameLen;
+    size_t maxValueLen;
 
-    max_name_len = 256;
-    max_value_len = 8192;
-    if (name.length() > max_name_len)
+    maxNameLen = 256;
+    maxValueLen = 8192;
+    if (name.length() > maxNameLen)
         return (0);
-    if (value.length() > max_value_len)
+    if (value.length() > maxValueLen)
         return (0);
     return (1);
 }

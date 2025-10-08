@@ -6,42 +6,42 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:15:47 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 12:59:58 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/08 14:45:41 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-static void processEvents(std::vector<struct pollfd> &pollfds, int server_fd)
+static void processEvents(std::vector<struct pollfd> &pollFds, int serverFd)
 {
     size_t i;
 
     i = 0;
-    while (i < pollfds.size())
+    while (i < pollFds.size())
     {
-        if (pollfds[i].revents & POLLIN)
+        if (pollFds[i].revents & POLLIN)
         {
-            if (pollfds[i].fd == server_fd)
-                handleNewConnection(pollfds, server_fd);
+            if (pollFds[i].fd == serverFd)
+                handleNewConnection(pollFds, serverFd);
             else
             {
-                if (!handleClientData(pollfds, i))
+                if (!handleClientData(pollFds, i))
                     i--;
             }
         }
-        pollfds[i].revents = 0;
+        pollFds[i].revents = 0;
         i++;
     }
 }
 
-void eventLoop(int server_fd)
+void eventLoop(int serverFd)
 {
-    std::vector<struct pollfd> pollfds;
+    std::vector<struct pollfd> pollFds;
 
-    initPollServer(pollfds, server_fd);
+    initPollServer(pollFds, serverFd);
     while (1)
     {
-        if (waitForEvents(pollfds) > 0)
-            processEvents(pollfds, server_fd);
+        if (waitForEvents(pollFds) > 0)
+            processEvents(pollFds, serverFd);
     }
 }
