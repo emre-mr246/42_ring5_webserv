@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 22:14:28 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 14:45:40 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/09 19:48:08 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,16 +69,6 @@ static void updateServerBlockState(const std::string &line, configData &state, s
     handleBraceDepth(line, state, all);
 }
 
-static void finalizeConfig(configData &state, std::vector<ServerConfig> &all)
-{
-    if (state.depth >= 0)
-    {
-        if (state.inLocation)
-            state.currentServer.locations.push_back(state.currentLocation);
-        all.push_back(state.currentServer);
-    }
-}
-
 void parserConfig(std::ifstream &configFile, std::vector<ServerConfig> &serverConfigs)
 {
     configData state;
@@ -103,5 +93,10 @@ void parserConfig(std::ifstream &configFile, std::vector<ServerConfig> &serverCo
         else if (isValidLocationDirective(line, state.depth, state.inLocation))
             parseLocationDirective(line, state.currentLocation);
     }
-    finalizeConfig(state, serverConfigs);
+    if (state.depth >= 0)
+    {
+        if (state.inLocation)
+            state.currentServer.locations.push_back(state.currentLocation);
+        serverConfigs.push_back(state.currentServer);
+    }
 }

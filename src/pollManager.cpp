@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:15:47 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 14:45:40 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/09 19:48:08 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,22 @@ void removeClientFromPoll(std::vector<struct pollfd> &pollFds, size_t index)
 {
     if (index < pollFds.size())
         pollFds.erase(pollFds.begin() + index);
+}
+
+void updateClientEvents(std::vector<struct pollfd> &pollFds, int clientFd, short events)
+{
+    size_t i;
+
+    i = 0;
+    while (i < pollFds.size())
+    {
+        if (pollFds[i].fd == clientFd)
+        {
+            pollFds[i].events = events;
+            return;
+        }
+        i++;
+    }
 }
 
 int waitForEvents(std::vector<struct pollfd> &pollFds)

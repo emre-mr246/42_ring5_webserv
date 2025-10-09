@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:12:19 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 14:45:40 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/09 19:48:08 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void handleNewConnection(std::vector<struct pollfd> &pollFds, int serverFd)
     addClientToPoll(pollFds, clientFd);
 }
 
-static void handleRequest(const HttpRequest &req, int clientFd)
+static void handleRequest(const HttpRequest &req, int clientFd, std::vector<struct pollfd> &pollFds)
 {
     HttpResponse response;
     std::string responseStr;
@@ -52,10 +52,11 @@ static void handleRequest(const HttpRequest &req, int clientFd)
     else
         response = createErrorResponse(405);
     responseStr = buildHttpResponse(response);
-    sendResponseToClient(clientFd, responseStr);
+    setPendingResponse(clientFd, responseStr);
+    updateClientEvents(pollFds, clientFd, POLLIN | POLLOUT);
 }
 
-static void parseAndHandleRequest(const char *buf, ssize_t bytesRead, int clientFd)
+static void parseAndHandleRequest(const char *buf, ssize_t bytesRead, int clientFd, std::vector<struct pollfd> &pollFds)
 {
     HttpRequest req;
     HttpResponse response;
@@ -65,14 +66,15 @@ static void parseAndHandleRequest(const char *buf, ssize_t bytesRead, int client
     {
         response = createErrorResponse(413);
         responseStr = buildHttpResponse(response);
-        sendResponseToClient(clientFd, responseStr);
+        setPendingResponse(clientFd, responseStr);
+        updateClientEvents(pollFds, clientFd, POLLIN | POLLOUT);
         return;
     }
     printHttpRequest(req);
-    handleRequest(req, clientFd);
+    handleRequest(req, clientFd, pollFds);
 }
 
-int readFromClient(int clientFd)
+int readFromClient(int clientFd, std::vector<struct pollfd> &pollFds)
 {
     char buf[4096];
     ssize_t bytesRead;
@@ -80,27 +82,10 @@ int readFromClient(int clientFd)
     bytesRead = read(clientFd, buf, sizeof(buf));
     if (bytesRead > 0)
     {
-        parseAndHandleRequest(buf, bytesRead, clientFd);
+        parseAndHandleRequest(buf, bytesRead, clientFd, pollFds);
         return (1);
     }
     if (bytesRead == 0)
         return (0);
-    if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)
-        return (1);
-    printError("read()");
     return (0);
-}
-
-int handleClientData(std::vector<struct pollfd> &pollFds, size_t i)
-{
-    int clientFd;
-
-    clientFd = pollFds[i].fd;
-    if (!readFromClient(clientFd))
-    {
-        close(clientFd);
-        removeClientFromPoll(pollFds, i);
-        return (0);
-    }
-    return (1);
 }

@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:15:47 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 14:45:41 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/09 19:48:09 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,14 +19,22 @@ static void processEvents(std::vector<struct pollfd> &pollFds, int serverFd)
     i = 0;
     while (i < pollFds.size())
     {
-        if (pollFds[i].revents & POLLIN)
+        if (pollFds[i].fd == serverFd)
         {
-            if (pollFds[i].fd == serverFd)
+            if (pollFds[i].revents & POLLIN)
                 handleNewConnection(pollFds, serverFd);
-            else
+        }
+        else
+        {
+            if (pollFds[i].revents & POLLIN)
             {
                 if (!handleClientData(pollFds, i))
-                    i--;
+                    continue;
+            }
+            if (i < pollFds.size() && (pollFds[i].revents & POLLOUT))
+            {
+                if (!handleClientWrite(pollFds, i))
+                    continue;
             }
         }
         pollFds[i].revents = 0;

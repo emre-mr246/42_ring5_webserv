@@ -4,7 +4,7 @@ CXX         = c++
 CXXFLAGS    = -Wall -Wextra -Werror -std=c++98 -pedantic -g
 RM          = rm -rf
 
-SRCS        = main.cpp error.cpp serverExtract.cpp printConfig.cpp location.cpp location2.cpp parserUtils.cpp parserAddressError.cpp parser2.cpp debug.cpp parser.cpp utils.cpp pollManager.cpp connectionHandler.cpp eventLoop.cpp socket.cpp config.cpp validation.cpp requestParser.cpp headerParser.cpp responseBuilder.cpp requestPrinter.cpp requestProcessor.cpp chunkedDecoder.cpp requestValidator.cpp errorResponse.cpp responseSender.cpp pathResolver.cpp fileReader.cpp mimeType.cpp getHandler.cpp postHandler.cpp fileWriter.cpp
+SRCS        = main.cpp error.cpp serverExtract.cpp printConfig.cpp printConfig2.cpp location.cpp location2.cpp parserUtils.cpp parserAddressError.cpp parser2.cpp debug.cpp parser.cpp utils.cpp pollManager.cpp connectionHandler.cpp connectionHandler2.cpp eventLoop.cpp socket.cpp config.cpp validation.cpp requestParser.cpp headerParser.cpp responseBuilder.cpp requestPrinter.cpp requestProcessor.cpp chunkedDecoder.cpp requestValidator.cpp errorResponse.cpp responseSender.cpp responseQueue.cpp pathResolver.cpp fileReader.cpp mimeType.cpp getHandler.cpp postHandler.cpp fileWriter.cpp
 HDRS        = webserv.hpp http.hpp
 
 vpath %.cpp src src/config src/debug src/http

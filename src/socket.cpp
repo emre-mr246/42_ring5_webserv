@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:15:47 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 14:45:41 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/09 19:48:09 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,10 +53,9 @@ static int setNonblocking(int fd)
     return (0);
 }
 
-static int bindSocket(int fd)
+static int bindAndListen(int fd, int backlog)
 {
     struct sockaddr_in address;
-    std::ostringstream oss;
 
     memset(&address, 0, sizeof(address));
     address.sin_family = AF_INET;
@@ -67,25 +66,11 @@ static int bindSocket(int fd)
         printError("bind()");
         return (-1);
     }
-    return (0);
-}
-
-static int listenSocket(int fd, int backlog)
-{
     if (listen(fd, backlog) == -1)
     {
         printError("listen()");
         return (-1);
     }
-    return (0);
-}
-
-static int bindAndListen(int fd, int backlog)
-{
-    if (bindSocket(fd) == -1)
-        return (-1);
-    if (listenSocket(fd, backlog) == -1)
-        return (-1);
     return (0);
 }
 

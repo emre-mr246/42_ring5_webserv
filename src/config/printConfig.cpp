@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 14:49:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 14:45:40 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/09 19:48:08 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,27 +54,6 @@ static void printErrorPages(const std::map<int, std::string> &errorPages)
         std::cout << "[CONFIG] Error page " << it->first << ": " << it->second << std::endl;
         it++;
     }
-}
-
-static void printAcceptedMethods(const std::vector<std::string> &acceptedMethods)
-{
-    std::vector<std::string>::const_iterator it;
-
-    if (acceptedMethods.empty())
-    {
-        std::cout << "[CONFIG]   Accepted methods: (none specified)" << std::endl;
-        return;
-    }
-    std::cout << "[CONFIG]   Accepted methods: ";
-    it = acceptedMethods.begin();
-    while (it != acceptedMethods.end())
-    {
-        std::cout << *it;
-        it++;
-        if (it != acceptedMethods.end())
-            std::cout << ", ";
-    }
-    std::cout << std::endl;
 }
 
 static void printLocations(const std::vector<LocationConfig> &locations)

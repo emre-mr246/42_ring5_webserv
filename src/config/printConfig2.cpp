@@ -1,33 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   printConfig2.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/22 10:51:54 by emgul            #+#    #+#              */
+/*   Created: 2025/10/09 19:48:08 by emgul            #+#    #+#              */
 /*   Updated: 2025/10/09 19:48:08 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-int main(int argc, char **argv)
+void printAcceptedMethods(const std::vector<std::string> &acceptedMethods)
 {
-    int serverFd;
-    Config serverConfig;
+    std::vector<std::string>::const_iterator it;
 
-    if (argc != 2)
+    if (acceptedMethods.empty())
     {
-        std::cerr << "Usage: " << argv[0] << " <configuration file>" << std::endl;
-        return (1);
+        std::cout << "[CONFIG]   Accepted methods: (none specified)" << std::endl;
+        return;
     }
-    if (!serverConfig.loadConfig(argv[1]))
-        return (1);
-    serverFd = createListeningSocket();
-    if (serverFd == -1)
-        return (1);
-    eventLoop(serverFd);
-    close(serverFd);
-    return (0);
+    std::cout << "[CONFIG]   Accepted methods: ";
+    it = acceptedMethods.begin();
+    while (it != acceptedMethods.end())
+    {
+        std::cout << *it;
+        it++;
+        if (it != acceptedMethods.end())
+            std::cout << ", ";
+    }
+    std::cout << std::endl;
 }

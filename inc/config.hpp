@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 21:32:43 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/08 14:45:41 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/09 19:48:09 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,3 +91,4 @@ std::vector<std::string> extractServerNames(const std::string &line);
 int validateServerConfig(const ServerConfig &server);
 int validateAllServers(const std::vector<ServerConfig> &servers);
 void printConfig(const Config &serverConfig);
+void printAcceptedMethods(const std::vector<std::string> &acceptedMethods);
