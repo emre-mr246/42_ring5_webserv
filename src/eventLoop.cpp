@@ -12,44 +12,52 @@
 
 #include "webserv.hpp"
 
-static void processEvents(std::vector<struct pollfd> &pollFds, int serverFd)
+static int isServerFd(const std::vector<int> &serverFds, int fd)
+{
+    size_t i;
+
+    i = 0;
+    while (i < serverFds.size())
+    {
+        if (serverFds[i] == fd)
+            return (1);
+        i++;
+    }
+    return (0);
+}
+
+static void processEvents(std::vector<struct pollfd> &pollFds, const std::vector<int> &serverFds)
 {
     size_t i;
 
     i = 0;
     while (i < pollFds.size())
     {
-        if (pollFds[i].fd == serverFd)
+        if (isServerFd(serverFds, pollFds[i].fd))
         {
             if (pollFds[i].revents & POLLIN)
-                handleNewConnection(pollFds, serverFd);
+                handleNewConnection(pollFds, pollFds[i].fd);
         }
         else
         {
-            if (pollFds[i].revents & POLLIN)
-            {
-                if (!handleClientData(pollFds, i))
-                    continue;
-            }
-            if (i < pollFds.size() && (pollFds[i].revents & POLLOUT))
-            {
-                if (!handleClientWrite(pollFds, i))
-                    continue;
-            }
+            if ((pollFds[i].revents & POLLIN) && !handleClientData(pollFds, i))
+                continue;
+            if (i < pollFds.size() && (pollFds[i].revents & POLLOUT) && !handleClientWrite(pollFds, i))
+                continue;
         }
         pollFds[i].revents = 0;
         i++;
     }
 }
 
-void eventLoop(int serverFd)
+void eventLoop(const std::vector<int> &serverFds)
 {
     std::vector<struct pollfd> pollFds;
 
-    initPollServer(pollFds, serverFd);
+    initPollServer(pollFds, serverFds);
     while (1)
     {
         if (waitForEvents(pollFds) > 0)
-            processEvents(pollFds, serverFd);
+            processEvents(pollFds, serverFds);
     }
 }

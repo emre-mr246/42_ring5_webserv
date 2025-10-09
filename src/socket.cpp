@@ -53,39 +53,23 @@ static int setNonblocking(int fd)
     return (0);
 }
 
-static int bindAndListen(int fd, int backlog)
-{
-    struct sockaddr_in address;
-
-    memset(&address, 0, sizeof(address));
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = htonl(INADDR_ANY);
-    address.sin_port = htons(PORT);
-    if (bind(fd, (struct sockaddr *)&address, sizeof(address)) == -1)
-    {
-        printError("bind()");
-        return (-1);
-    }
-    if (listen(fd, backlog) == -1)
-    {
-        printError("listen()");
-        return (-1);
-    }
-    return (0);
-}
-
-int createListeningSocket()
+int createListeningSocket(const std::string &host, int port)
 {
     int fd;
 
     fd = createSocket();
     if (fd == -1)
         return (-1);
-    if (setReuseaddr(fd) == -1 || setNonblocking(fd) == -1 || bindAndListen(fd, BACKLOG) == -1)
+    if (setReuseaddr(fd) == -1 || setNonblocking(fd) == -1 || bindServerSocket(fd, host, port, BACKLOG) == -1)
     {
         close(fd);
         return (-1);
     }
-    std::cout << "Server listening on port " << PORT << " (fd: " << fd << ")" << std::endl;
+    std::cout << "Server listening on ";
+    if (host.empty())
+        std::cout << "0.0.0.0";
+    else
+        std::cout << host;
+    std::cout << ":" << port << " (fd: " << fd << ")" << std::endl;
     return (fd);
 }

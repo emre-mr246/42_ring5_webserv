@@ -12,15 +12,21 @@
 
 #include "webserv.hpp"
 
-void initPollServer(std::vector<struct pollfd> &pollFds, int serverFd)
+void initPollServer(std::vector<struct pollfd> &pollFds, const std::vector<int> &serverFds)
 {
-    struct pollfd serverPoll;
+    struct pollfd entry;
+    size_t i;
 
     pollFds.clear();
-    serverPoll.fd = serverFd;
-    serverPoll.events = POLLIN;
-    serverPoll.revents = 0;
-    pollFds.push_back(serverPoll);
+    i = 0;
+    while (i < serverFds.size())
+    {
+        entry.fd = serverFds[i];
+        entry.events = POLLIN;
+        entry.revents = 0;
+        pollFds.push_back(entry);
+        i++;
+    }
 }
 
 void addClientToPoll(std::vector<struct pollfd> &pollFds, int clientFd)
@@ -59,11 +65,16 @@ int waitForEvents(std::vector<struct pollfd> &pollFds)
 {
     int result;
 
-    result = poll(pollFds.data(), pollFds.size(), -1);
-    if (result == -1)
+    while (1)
     {
-        printError("poll()");
-        return (-1);
+        result = poll(pollFds.data(), pollFds.size(), -1);
+        if (result == -1)
+        {
+            if (errno == EINTR)
+                continue;
+            printError("poll()");
+            return (-1);
+        }
+        return (result);
     }
-    return (result);
 }

@@ -59,43 +59,14 @@ void *memset(void *str, int c, size_t n)
     return (str);
 }
 
-size_t strlen(const char *str)
-{
-    size_t len;
-
-    len = 0;
-    while (str[len])
-        len++;
-    return (len);
-}
-
-size_t strlcpy(char *dst, const char *src, size_t dstsize)
-{
-    size_t len;
-    size_t i;
-
-    len = strlen(src);
-    i = 0;
-    if (dstsize)
-    {
-        while (i < (dstsize - 1) && src[i])
-        {
-            dst[i] = src[i];
-            i++;
-        }
-        dst[i] = '\0';
-    }
-    return (len);
-}
-
 std::string strtrim(const std::string &str)
 {
     size_t first;
     size_t last;
 
-    first = str.find_first_not_of(" \t\n\r");
+    first = str.find_first_not_of(" \t\n\v\f\r");
     if (first == std::string::npos)
         return ("");
-    last = str.find_last_not_of(" \t\n\r");
+    last = str.find_last_not_of(" \t\n\v\f\r");
     return (str.substr(first, (last - first + 1)));
 }
