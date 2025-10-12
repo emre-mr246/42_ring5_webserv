@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:36 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/09 19:48:09 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/12 17:19:28 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,21 +16,19 @@
 #include <string>
 #include <vector>
 
-struct HttpRequest
-{
-    std::string method;
-    std::string uri;
-    std::string version;
-    std::map<std::string, std::string> headers;
-    std::string body;
+struct HttpRequest {
+  std::string method;
+  std::string uri;
+  std::string version;
+  std::map<std::string, std::string> headers;
+  std::string body;
 };
 
-struct HttpResponse
-{
-    int statusCode;
-    std::string statusMessage;
-    std::map<std::string, std::string> headers;
-    std::string body;
+struct HttpResponse {
+  int statusCode;
+  std::string statusMessage;
+  std::map<std::string, std::string> headers;
+  std::string body;
 };
 
 int parseRequestLine(const std::string &line, HttpRequest &req);

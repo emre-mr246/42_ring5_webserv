@@ -6,13 +6,10 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 14:42:01 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/09 19:48:08 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/12 17:19:28 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-void debug(const Config &serverConfig)
-{
-    printConfig(serverConfig);
-}
+void debug(const Config &serverConfig) { printConfig(serverConfig); }

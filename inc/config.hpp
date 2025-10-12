@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 21:32:43 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/09 19:48:09 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/12 17:19:28 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,52 +18,49 @@
 #include <string>
 #include <vector>
 
-struct LocationConfig
-{
-    std::string path;
-    std::string root;
-    std::string indexFile;
-    bool autoindex;
-    std::vector<std::string> acceptedMethods;
-    std::pair<int, std::string> redirect;
-    std::string uploadPath;
-    size_t clientMaxBodySize;
-    std::pair<std::string, std::string> cgiPass;
+struct LocationConfig {
+  std::string path;
+  std::string root;
+  std::string indexFile;
+  bool autoindex;
+  std::vector<std::string> acceptedMethods;
+  std::pair<int, std::string> redirect;
+  std::string uploadPath;
+  size_t clientMaxBodySize;
+  std::pair<std::string, std::string> cgiPass;
 };
 
-struct ServerConfig
-{
-    std::vector<std::pair<std::string, int> > listenOn;
-    std::vector<std::string> serverNames;
-    std::map<int, std::string> errorPages;
-    size_t clientMaxBodySize;
-    std::vector<LocationConfig> locations;
+struct ServerConfig {
+  std::vector<std::pair<std::string, int>> listenOn;
+  std::vector<std::string> serverNames;
+  std::map<int, std::string> errorPages;
+  size_t clientMaxBodySize;
+  std::vector<LocationConfig> locations;
 };
 
-struct configData
-{
-    int depth;
-    bool inLocation;
-    ServerConfig currentServer;
-    LocationConfig currentLocation;
+struct configData {
+  int depth;
+  bool inLocation;
+  ServerConfig currentServer;
+  LocationConfig currentLocation;
 };
 
-class Config
-{
-  private:
-    std::vector<ServerConfig> serverConfigs;
+class Config {
+private:
+  std::vector<ServerConfig> serverConfigs;
 
-  public:
-    Config();
-    Config(const Config &other);
-    Config &operator=(const Config &other);
-    ~Config();
+public:
+  Config();
+  Config(const Config &other);
+  Config &operator=(const Config &other);
+  ~Config();
 
-    int loadConfig(const std::string &filePath);
-    const std::vector<ServerConfig> &getServerConfigs() const;
+  int loadConfig(const std::string &filePath);
+  const std::vector<ServerConfig> &getServerConfigs() const;
 };
 
-void parserConfig(std::ifstream &configFile, std::vector<ServerConfig> &serverConfigs);
+void parserConfig(std::ifstream &configFile,
+                  std::vector<ServerConfig> &serverConfigs);
 void printConfig(const Config &serverConfig);
 int isComment(const std::string &line);
 bool isServerBlock(const std::string &line);
@@ -77,7 +74,8 @@ void addListenAddress(const std::string &value, ServerConfig &server);
 void addErrorPages(const std::string &value, ServerConfig &server);
 void parseLocationDirective(const std::string &line, LocationConfig &location);
 void parseServerDirective(const std::string &line, ServerConfig &server);
-int isValidLocationDirective(const std::string &line, int depth, bool inLocation);
+int isValidLocationDirective(const std::string &line, int depth,
+                             bool inLocation);
 int isValidServerDirective(const std::string &line, int depth, bool inLocation);
 std::string extractLocationPath(const std::string &line);
 std::vector<std::string> extractAcceptedMethods(const std::string &line);
