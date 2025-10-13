@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 10:51:54 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/12 17:19:28 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/13 03:48:02 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@
 void printError(const std::string &context);
 int createListeningSocket(const std::string &host, int port);
 int bindServerSocket(int fd, const std::string &host, int port, int backlog);
+int setNonblocking(int fd);
 void addUniqueAddress(std::vector<std::pair<std::string, int>> &addresses,
                       const std::string &host, int port);
 void gatherAddresses(const Config &config,
@@ -59,7 +60,6 @@ void *memset(void *str, int c, size_t n);
 std::string strtrim(const std::string &str);
 long strtol(const char *ptr, char **endptr);
 int isspace(int c);
-void debug(const Config &serverConfig);
 void eventLoop(const std::vector<int> &serverFds);
 void updateClientTime(int clientFd);
 void removeClientTime(int clientFd);

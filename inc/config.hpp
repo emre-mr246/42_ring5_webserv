@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 21:32:43 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/12 17:19:28 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/13 03:48:02 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,45 +18,51 @@
 #include <string>
 #include <vector>
 
-struct LocationConfig {
-  std::string path;
-  std::string root;
-  std::string indexFile;
-  bool autoindex;
-  std::vector<std::string> acceptedMethods;
-  std::pair<int, std::string> redirect;
-  std::string uploadPath;
-  size_t clientMaxBodySize;
-  std::pair<std::string, std::string> cgiPass;
+#define DEFAULT_CONFIG_PATH "config/config.rare"
+
+struct LocationConfig
+{
+    std::string path;
+    std::string root;
+    std::string indexFile;
+    bool autoindex;
+    std::vector<std::string> acceptedMethods;
+    std::pair<int, std::string> redirect;
+    std::string uploadPath;
+    size_t clientMaxBodySize;
+    std::pair<std::string, std::string> cgiPass;
 };
 
-struct ServerConfig {
-  std::vector<std::pair<std::string, int>> listenOn;
-  std::vector<std::string> serverNames;
-  std::map<int, std::string> errorPages;
-  size_t clientMaxBodySize;
-  std::vector<LocationConfig> locations;
+struct ServerConfig
+{
+    std::vector<std::pair<std::string, int>> listenOn;
+    std::vector<std::string> serverNames;
+    std::map<int, std::string> errorPages;
+    size_t clientMaxBodySize;
+    std::vector<LocationConfig> locations;
 };
 
-struct configData {
-  int depth;
-  bool inLocation;
-  ServerConfig currentServer;
-  LocationConfig currentLocation;
+struct configData
+{
+    int depth;
+    bool inLocation;
+    ServerConfig currentServer;
+    LocationConfig currentLocation;
 };
 
-class Config {
-private:
-  std::vector<ServerConfig> serverConfigs;
+class Config
+{
+  private:
+    std::vector<ServerConfig> serverConfigs;
 
-public:
-  Config();
-  Config(const Config &other);
-  Config &operator=(const Config &other);
-  ~Config();
+  public:
+    Config();
+    Config(const Config &other);
+    Config &operator=(const Config &other);
+    ~Config();
 
-  int loadConfig(const std::string &filePath);
-  const std::vector<ServerConfig> &getServerConfigs() const;
+    int loadConfig(const std::string &filePath);
+    const std::vector<ServerConfig> &getServerConfigs() const;
 };
 
 void parserConfig(std::ifstream &configFile,

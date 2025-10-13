@@ -6,69 +6,76 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 17:05:30 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/12 17:19:28 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/13 03:48:01 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-int isComment(const std::string &line) {
-  size_t i;
+int isComment(const std::string &line)
+{
+    size_t i;
 
-  i = 0;
-  while (i < line.length()) {
-    if (!isspace(line[i])) {
-      if (line[i] == '#')
-        return (1);
-      else
-        return (0);
+    i = 0;
+    while (i < line.length())
+    {
+        if (!isspace(line[i]))
+        {
+            if (line[i] == '#')
+                return (1);
+            else
+                return (0);
+        }
+        i++;
     }
-    i++;
-  }
-  return (0);
+    return (0);
 }
 
-bool isServerBlock(const std::string &line) {
-  std::string trimmed;
+bool isServerBlock(const std::string &line)
+{
+    std::string trimmed;
 
-  trimmed = strtrim(line);
-  return (trimmed == "server" || trimmed == "server {");
+    trimmed = strtrim(line);
+    return (trimmed == "server" || trimmed == "server {");
 }
 
-bool isLocationBlock(const std::string &line) {
-  std::string trimmed;
+bool isLocationBlock(const std::string &line)
+{
+    std::string trimmed;
 
-  trimmed = strtrim(line);
-  return (trimmed.find("location") == 0);
+    trimmed = strtrim(line);
+    return (trimmed.find("location") == 0);
 }
 
-int parsePort(const std::string &s) {
-  char *endptr = NULL;
-  long val = 0;
+int parsePort(const std::string &s)
+{
+    char *endptr = NULL;
+    long val = 0;
 
-  if (s.empty())
-    return (0);
-  val = strtol(s.c_str(), &endptr);
-  if (endptr == s.c_str() || val <= 0 || val > 65535)
-    return (0);
-  return (static_cast<int>(val));
+    if (s.empty())
+        return (0);
+    val = strtol(s.c_str(), &endptr);
+    if (endptr == s.c_str() || val <= 0 || val > 65535)
+        return (0);
+    return (static_cast<int>(val));
 }
 
-int parseBodySize(const std::string &s) {
-  char *endptr = NULL;
-  long val = 0;
-  long multiplier = 1;
+int parseBodySize(const std::string &s)
+{
+    char *endptr = NULL;
+    long val = 0;
+    long multiplier = 1;
 
-  if (s.empty())
-    return (0);
-  val = strtol(s.c_str(), &endptr);
-  if (endptr == s.c_str() || val < 0)
-    return (0);
-  if (*endptr == 'k' || *endptr == 'K')
-    multiplier = 1024;
-  else if (*endptr == 'm' || *endptr == 'M')
-    multiplier = 1024 * 1024;
-  else if (*endptr == 'g' || *endptr == 'G')
-    multiplier = 1024 * 1024 * 1024;
-  return (static_cast<int>(val * multiplier));
+    if (s.empty())
+        return (0);
+    val = strtol(s.c_str(), &endptr);
+    if (endptr == s.c_str() || val < 0)
+        return (0);
+    if (*endptr == 'k' || *endptr == 'K')
+        multiplier = 1024;
+    else if (*endptr == 'm' || *endptr == 'M')
+        multiplier = 1024 * 1024;
+    else if (*endptr == 'g' || *endptr == 'G')
+        multiplier = 1024 * 1024 * 1024;
+    return (static_cast<int>(val * multiplier));
 }
