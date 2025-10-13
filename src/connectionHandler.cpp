@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:12:19 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/13 03:48:02 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/13 05:01:13 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,5 @@ int readFromClient(int clientFd, std::vector<struct pollfd> &pollFds)
     }
     if (bytesRead == 0)
         return (0);
-    if (errno == EAGAIN || errno == EWOULDBLOCK)
-        return (1);
-    return (0);
+    return (1);
 }

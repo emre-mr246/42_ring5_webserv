@@ -6,16 +6,16 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 14:49:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/13 03:48:01 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/13 05:01:12 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
 static void
-printListenAddresses(const std::vector<std::pair<std::string, int>> &listenOn)
+printListenAddresses(const std::vector<std::pair<std::string, int> > &listenOn)
 {
-    std::vector<std::pair<std::string, int>>::const_iterator it;
+    std::vector<std::pair<std::string, int> >::const_iterator it;
 
     std::cout << "[CONFIG] Server listening on: ";
     it = listenOn.begin();

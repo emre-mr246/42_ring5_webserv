@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 03:47:21 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/13 03:48:02 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/13 05:01:13 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void cleanupSockets(const std::vector<int> &serverFds)
 int main(int argc, char **argv)
 {
     Config serverConfig;
-    std::vector<std::pair<std::string, int>> addresses;
+    std::vector<std::pair<std::string, int> > addresses;
     std::vector<int> serverFds;
     std::string configPath;
 

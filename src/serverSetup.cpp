@@ -6,13 +6,13 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 20:20:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/13 03:48:02 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/13 05:01:12 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-void addUniqueAddress(std::vector<std::pair<std::string, int>> &addresses,
+void addUniqueAddress(std::vector<std::pair<std::string, int> > &addresses,
                       const std::string &host, int port)
 {
     size_t i;
@@ -28,7 +28,7 @@ void addUniqueAddress(std::vector<std::pair<std::string, int>> &addresses,
 }
 
 void gatherAddresses(const Config &config,
-                     std::vector<std::pair<std::string, int>> &addresses)
+                     std::vector<std::pair<std::string, int> > &addresses)
 {
     const std::vector<ServerConfig> &servers = config.getServerConfigs();
     size_t i;
@@ -50,7 +50,7 @@ void gatherAddresses(const Config &config,
         addUniqueAddress(addresses, "0.0.0.0", PORT);
 }
 
-int openServerSockets(const std::vector<std::pair<std::string, int>> &addresses,
+int openServerSockets(const std::vector<std::pair<std::string, int> > &addresses,
                       std::vector<int> &fds)
 {
     size_t i;
