@@ -7,7 +7,7 @@ RM          = rm -rf
 SRCS        = main.cpp serverSetup.cpp error.cpp serverExtract.cpp printConfig.cpp printConfig2.cpp location.cpp location2.cpp parserUtils.cpp parserAddressError.cpp parser2.cpp parser.cpp utils.cpp pollManager.cpp connectionHandler.cpp connectionHandler2.cpp eventLoop.cpp socket.cpp socketBind.cpp config.cpp validation.cpp requestParser.cpp headerParser.cpp responseBuilder.cpp requestPrinter.cpp requestProcessor.cpp chunkedDecoder.cpp requestValidator.cpp errorResponse.cpp responseSender.cpp responseQueue.cpp pathResolver.cpp fileReader.cpp mimeType.cpp getHandler.cpp postHandler.cpp fileWriter.cpp clientTimeout.cpp cgiTimeout.cpp
 HDRS        = webserv.hpp http.hpp
 
-vpath %.cpp src src/config src/http
+vpath %.cpp src src/config src/debug src/http
 vpath %.hpp inc
 
 all: $(NAME)

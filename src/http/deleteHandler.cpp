@@ -1,11 +1,11 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   getHandler.cpp                                     :+:      :+:    :+:   */
+/*   deleteHandler.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/05 13:39:50 by emgul            #+#    #+#              */
+/*   Created: 2025/10/13 12:50:00 by emgul            #+#    #+#              */
 /*   Updated: 2025/10/14 15:25:07 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -13,33 +13,41 @@
 #include "http.hpp"
 #include "webserv.hpp"
 #include <sstream>
+#include <unistd.h>
 
-static HttpResponse createSuccessResponse(const std::string &content,
-                                          const std::string &mime)
+static HttpResponse createDeleteSuccessResponse(void)
 {
     HttpResponse response;
+    std::string body;
     std::ostringstream oss;
 
     response.statusCode = 200;
     response.statusMessage = "OK";
-    response.body = content;
-    oss << content.length();
+    body = "File deleted successfully";
+    response.body = body;
+    oss << body.length();
     response.headers["Content-Length"] = oss.str();
-    response.headers["Content-Type"] = mime;
+    response.headers["Content-Type"] = "text/plain";
     return (response);
 }
 
-HttpResponse handleGetRequest(const std::string &uri)
+static int deleteFileFromPath(const std::string &path)
+{
+    if (access(path.c_str(), F_OK) != 0)
+        return (0);
+    if (unlink(path.c_str()) == 0)
+        return (1);
+    return (0);
+}
+
+HttpResponse handleDeleteRequest(const std::string &uri)
 {
     std::string filePath;
-    std::string content;
-    std::string mimeType;
 
     filePath = resolveFilePath(uri);
     if (filePath.empty())
         return (createErrorResponse(403));
-    if (!readFile(filePath, content))
+    if (!deleteFileFromPath(filePath))
         return (createErrorResponse(404));
-    mimeType = getMimeType(filePath);
-    return (createSuccessResponse(content, mimeType));
+    return (createDeleteSuccessResponse());
 }

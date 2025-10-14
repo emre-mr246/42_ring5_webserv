@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:12:19 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/13 05:01:13 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/14 15:25:07 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,7 @@ int acceptClientConnection(int serverFd)
 
     clientFd = accept(serverFd, NULL, NULL);
     if (clientFd == -1)
-    {
-        if (errno == EAGAIN || errno == EWOULDBLOCK)
-            return (-1);
-        printError("accept()");
         return (-1);
-    }
     if (setNonblocking(clientFd) == -1)
     {
         close(clientFd);
@@ -55,6 +50,8 @@ static void handleRequest(const HttpRequest &req, int clientFd,
         response = handleGetRequest(req.uri);
     else if (req.method == "POST")
         response = handlePostRequest(req);
+    else if (req.method == "DELETE")
+        response = handleDeleteRequest(req.uri);
     else
         response = createErrorResponse(405);
     responseStr = buildHttpResponse(response);

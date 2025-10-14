@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:15:47 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/13 05:01:12 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/14 15:25:07 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,13 +74,7 @@ int waitForEvents(std::vector<struct pollfd> &pollFds)
     while (1)
     {
         result = poll(pollFds.data(), pollFds.size(), -1);
-        if (result == -1)
-        {
-            if (errno == EINTR)
-                continue;
-            printError("poll()");
-            return (-1);
-        }
-        return (result);
+        if (result != -1)
+            return (result);
     }
 }

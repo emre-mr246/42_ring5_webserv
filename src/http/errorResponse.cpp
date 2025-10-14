@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:35 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/13 05:01:12 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/14 15:25:06 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,14 @@ static std::string getErrorMessage(int code)
 {
     if (code == 400)
         return ("Bad Request");
+    if (code == 403)
+        return ("Forbidden");
     if (code == 404)
         return ("Not Found");
     if (code == 405)
         return ("Method Not Allowed");
+    if (code == 413)
+        return ("Payload Too Large");
     if (code == 500)
         return ("Internal Server Error");
     return ("Error");

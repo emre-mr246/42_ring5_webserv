@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:36 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/13 05:01:13 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/14 15:25:07 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ int writeFile(const std::string &path, const std::string &content);
 std::string getMimeType(const std::string &path);
 HttpResponse handleGetRequest(const std::string &uri);
 HttpResponse handlePostRequest(const HttpRequest &req);
+HttpResponse handleDeleteRequest(const std::string &uri);
 void setPendingResponse(int clientFd, const std::string &response);
 int hasPendingResponse(int clientFd);
 int sendPendingResponse(int clientFd);
