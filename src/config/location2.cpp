@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 14:49:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/14 15:25:07 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/16 12:56:13 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ std::pair<int, std::string> extractRedirect(const std::string &line)
     return (std::make_pair(code, url));
 }
 
-std::pair<std::string, std::string> extractCgiPass(const std::string &line)
+void addCgiPass(const std::string &line, LocationConfig &location)
 {
     std::string value;
     std::string ext;
@@ -94,14 +94,15 @@ std::pair<std::string, std::string> extractCgiPass(const std::string &line)
 
     pos = line.find("cgi_pass");
     if (pos == std::string::npos)
-        return (std::make_pair("", ""));
+        return;
     value = strtrim(line.substr(pos + 8));
     if (!value.empty() && value[value.length() - 1] == ';')
         value.resize(value.length() - 1);
     spacePos = value.find(' ');
     if (spacePos == std::string::npos)
-        return (std::make_pair("", ""));
+        return;
     ext = strtrim(value.substr(0, spacePos));
     path = strtrim(value.substr(spacePos + 1));
-    return (std::make_pair(ext, path));
+    if (!ext.empty() && !path.empty())
+        location.cgiPass[ext] = path;
 }

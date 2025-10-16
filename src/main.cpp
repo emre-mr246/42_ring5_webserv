@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 03:47:21 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/14 15:25:07 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/16 12:56:13 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ int main(int argc, char **argv)
     gatherAddresses(serverConfig, addresses);
     if (!openServerSockets(addresses, serverFds))
         return (1);
-    eventLoop(serverFds);
+    eventLoop(serverFds, &serverConfig);
     cleanupSockets(serverFds);
     return (0);
 }

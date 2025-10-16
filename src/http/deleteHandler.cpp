@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 12:50:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/14 15:25:07 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/16 12:56:13 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,11 +40,11 @@ static int deleteFileFromPath(const std::string &path)
     return (0);
 }
 
-HttpResponse handleDeleteRequest(const std::string &uri)
+HttpResponse handleDeleteRequest(const HttpRequest &req, const Config *config)
 {
     std::string filePath;
 
-    filePath = resolveFilePath(uri);
+    filePath = resolveFilePath(req.uri, req, config);
     if (filePath.empty())
         return (createErrorResponse(403));
     if (!deleteFileFromPath(filePath))

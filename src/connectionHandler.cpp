@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:12:19 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/14 15:25:07 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/16 12:56:13 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,8 @@ void handleNewConnection(std::vector<struct pollfd> &pollFds, int serverFd)
 }
 
 static void handleRequest(const HttpRequest &req, int clientFd,
-                          std::vector<struct pollfd> &pollFds)
+                          std::vector<struct pollfd> &pollFds,
+                          const Config *config)
 {
     HttpResponse response;
     std::string responseStr;
@@ -47,11 +48,11 @@ static void handleRequest(const HttpRequest &req, int clientFd,
     if (!validateHttpRequest(req))
         response = createErrorResponse(400);
     else if (req.method == "GET")
-        response = handleGetRequest(req.uri);
+        response = handleGetRequest(req, config);
     else if (req.method == "POST")
         response = handlePostRequest(req);
     else if (req.method == "DELETE")
-        response = handleDeleteRequest(req.uri);
+        response = handleDeleteRequest(req, config);
     else
         response = createErrorResponse(405);
     responseStr = buildHttpResponse(response);
@@ -61,7 +62,8 @@ static void handleRequest(const HttpRequest &req, int clientFd,
 
 static void parseAndHandleRequest(const char *buf, ssize_t bytesRead,
                                   int clientFd,
-                                  std::vector<struct pollfd> &pollFds)
+                                  std::vector<struct pollfd> &pollFds,
+                                  const Config *config)
 {
     HttpRequest req;
     HttpResponse response;
@@ -76,10 +78,11 @@ static void parseAndHandleRequest(const char *buf, ssize_t bytesRead,
         return;
     }
     printHttpRequest(req);
-    handleRequest(req, clientFd, pollFds);
+    handleRequest(req, clientFd, pollFds, config);
 }
 
-int readFromClient(int clientFd, std::vector<struct pollfd> &pollFds)
+int readFromClient(int clientFd, std::vector<struct pollfd> &pollFds,
+                   const Config *config)
 {
     char buf[4096];
     ssize_t bytesRead;
@@ -88,7 +91,7 @@ int readFromClient(int clientFd, std::vector<struct pollfd> &pollFds)
     if (bytesRead > 0)
     {
         updateClientTime(clientFd);
-        parseAndHandleRequest(buf, bytesRead, clientFd, pollFds);
+        parseAndHandleRequest(buf, bytesRead, clientFd, pollFds, config);
         return (1);
     }
     if (bytesRead == 0)

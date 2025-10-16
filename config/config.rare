@@ -3,67 +3,41 @@
 server {
     listen 8080;
     listen 127.0.0.1:8081;
-    server_name localhost hisarsec.com www.hisarsec.com;
-
+    server_name hogwarts hogwarts.com hogwarts.com.tr;
     client_max_body_size 1048576;
-    
     error_page 404 /error_pages/404.html;
     error_page 500 502 503 504 /error_pages/50x.html;
     
-    location / {
-        root /var/www/html;
-        index index.html index.htm;
+    location /
+	{
+        root /home/mr246/Documents/webserv/www;
+        index index.py;
         autoindex on;
         accepted_methods GET POST;
+        cgi_pass .py /usr/bin/python3;
+        cgi_pass .pl /usr/bin/perl;
     }
-    
-    location /upload {
+    location /upload
+	{
         root /var/www/uploads;
         accepted_methods POST DELETE;
         upload_path /var/www/uploads;
         client_max_body_size 10485760;
     }
-    
-    location /api {
-        root /var/www/api;
-        accepted_methods GET POST PUT DELETE;
-        redirect 301 /api/v1;
-    }
-    
-    location /cgi-bin {
-        root /var/www/cgi-bin;
-        accepted_methods GET POST;
-        cgi_pass .py /usr/bin/python3;
-        cgi_pass .pl /usr/bin/perl;
-    }
 }
 
 server {
     listen 0.0.0.0:8181;
-    listen [::]:80;
-    server_name intra.hisarsec.com api.hisarsec.com;
-
+    server_name localhost hisarsec.com;
     client_max_body_size 2097152;
-    
     error_page 403 /errors/403.html;
     error_page 404 /errors/404.html;
     
-    location / {
-        root /var/www/site2;
+    location /
+	{
+        root /home/mr246/Documents/webserv/hisar;
         index index.html;
         autoindex off;
         accepted_methods GET;
-    }
-    
-    location /static {
-        root /var/www/static;
-        accepted_methods GET;
-        autoindex on;
-    }
-    
-    location /admin {
-        root /var/www/admin;
-        accepted_methods GET POST PUT DELETE;
-        redirect 302 /admin/login;
     }
 }

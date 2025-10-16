@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 22:14:28 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/14 15:25:07 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/16 12:56:13 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void parseLocationDirective(const std::string &line, LocationConfig &location)
     else if (trimmed.find("redirect") == 0)
         location.redirect = extractRedirect(line);
     else if (trimmed.find("cgi_pass") == 0)
-        location.cgiPass = extractCgiPass(line);
+        addCgiPass(line, location);
 }
 
 void parseServerDirective(const std::string &line, ServerConfig &server)

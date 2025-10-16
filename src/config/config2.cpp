@@ -1,28 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   responseSender.cpp                                 :+:      :+:    :+:   */
+/*   config2.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/05 13:39:50 by emgul            #+#    #+#              */
+/*   Created: 2025/10/15 12:10:00 by emgul            #+#    #+#              */
 /*   Updated: 2025/10/16 12:56:13 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "http.hpp"
+#include "config.hpp"
 #include "webserv.hpp"
 
-int sendResponseToClient(int clientFd, std::string &response, size_t &offset)
+int readConfigFile(const std::string &filePath,
+                   std::vector<ServerConfig> &serverConfigs)
 {
-    ssize_t bytesSent;
-    size_t remaining;
+    std::ifstream configFile(filePath.c_str());
 
-    if (offset >= response.length())
-        return (1);
-    remaining = response.length() - offset;
-    bytesSent = write(clientFd, response.c_str() + offset, remaining);
-    if (bytesSent > 0)
-        offset = offset + bytesSent;
+    if (!configFile.is_open())
+    {
+        std::cerr << "[ERROR] Could not open configuration file: " << filePath
+                  << std::endl;
+        return (0);
+    }
+    std::cout << "[INFO] Reading configuration file..." << std::endl;
+    parserConfig(configFile, serverConfigs);
+    configFile.close();
     return (1);
 }

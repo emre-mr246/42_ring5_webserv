@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 14:49:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/14 15:25:07 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/16 12:56:13 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,24 +65,7 @@ static void printLocations(const std::vector<LocationConfig> &locations)
     it = locations.begin();
     while (it != locations.end())
     {
-        std::cout << "[CONFIG] Location path: " << it->path << std::endl;
-        std::cout << "[CONFIG]   Client max body size: "
-                  << (it->clientMaxBodySize + 1023) / 1024 << " KB" << std::endl;
-        printAcceptedMethods(it->acceptedMethods);
-        if (!it->root.empty())
-            std::cout << "[CONFIG]   Root: " << it->root << std::endl;
-        if (!it->indexFile.empty())
-            std::cout << "[CONFIG]   Index: " << it->indexFile << std::endl;
-        std::cout << "[CONFIG]   Autoindex: " << (it->autoindex ? "on" : "off")
-                  << std::endl;
-        if (!it->uploadPath.empty())
-            std::cout << "[CONFIG]   Upload path: " << it->uploadPath << std::endl;
-        if (it->redirect.first != 0)
-            std::cout << "[CONFIG]   Redirect: " << it->redirect.first << " "
-                      << it->redirect.second << std::endl;
-        if (!it->cgiPass.first.empty())
-            std::cout << "[CONFIG]   CGI pass: " << it->cgiPass.first << " -> "
-                      << it->cgiPass.second << std::endl;
+        printSingleLocation(*it);
         it++;
     }
 }

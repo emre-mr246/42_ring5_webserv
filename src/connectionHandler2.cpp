@@ -6,19 +6,20 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 19:48:09 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/14 15:25:07 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/16 12:56:13 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http.hpp"
 #include "webserv.hpp"
 
-int handleClientData(std::vector<struct pollfd> &pollFds, size_t i)
+int handleClientData(std::vector<struct pollfd> &pollFds, size_t i,
+                     const Config *config)
 {
     int clientFd;
 
     clientFd = pollFds[i].fd;
-    if (!readFromClient(clientFd, pollFds))
+    if (!readFromClient(clientFd, pollFds, config))
     {
         close(clientFd);
         clearPendingResponse(clientFd);

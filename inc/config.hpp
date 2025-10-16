@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 21:32:43 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/14 15:25:07 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/16 12:56:13 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ struct LocationConfig
     std::pair<int, std::string> redirect;
     std::string uploadPath;
     size_t clientMaxBodySize;
-    std::pair<std::string, std::string> cgiPass;
+    std::map<std::string, std::string> cgiPass;
 };
 
 struct ServerConfig
@@ -57,17 +57,16 @@ class Config
 
   public:
     Config();
-    Config(const Config &other);
-    Config &operator=(const Config &other);
     ~Config();
 
     int loadConfig(const std::string &filePath);
     const std::vector<ServerConfig> &getServerConfigs() const;
 };
 
+int readConfigFile(const std::string &filePath,
+                   std::vector<ServerConfig> &serverConfigs);
 void parserConfig(std::ifstream &configFile,
                   std::vector<ServerConfig> &serverConfigs);
-void printConfig(const Config &serverConfig);
 int isComment(const std::string &line);
 bool isServerBlock(const std::string &line);
 bool isLocationBlock(const std::string &line);
@@ -90,9 +89,11 @@ std::string extractIndex(const std::string &line);
 bool extractAutoindex(const std::string &line);
 std::string extractUploadPath(const std::string &line);
 std::pair<int, std::string> extractRedirect(const std::string &line);
-std::pair<std::string, std::string> extractCgiPass(const std::string &line);
+void addCgiPass(const std::string &line, LocationConfig &location);
 std::vector<std::string> extractServerNames(const std::string &line);
 int validateServerConfig(const ServerConfig &server);
 int validateAllServers(const std::vector<ServerConfig> &servers);
 void printConfig(const Config &serverConfig);
 void printAcceptedMethods(const std::vector<std::string> &acceptedMethods);
+void printCgiPasses(const std::map<std::string, std::string> &cgiPass);
+void printSingleLocation(const LocationConfig &location);

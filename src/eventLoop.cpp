@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:15:47 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/14 15:25:07 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/16 12:56:13 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,8 @@ static int isServerFd(const std::vector<int> &serverFds, int fd)
 }
 
 static void processEvents(std::vector<struct pollfd> &pollFds,
-                          const std::vector<int> &serverFds)
+                          const std::vector<int> &serverFds,
+                          const Config *config)
 {
     size_t i;
 
@@ -41,7 +42,7 @@ static void processEvents(std::vector<struct pollfd> &pollFds,
         }
         else
         {
-            if ((pollFds[i].revents & POLLIN) && !handleClientData(pollFds, i))
+            if ((pollFds[i].revents & POLLIN) && !handleClientData(pollFds, i, config))
                 continue;
             if (i < pollFds.size() && (pollFds[i].revents & POLLOUT) &&
                 !handleClientWrite(pollFds, i))
@@ -52,7 +53,7 @@ static void processEvents(std::vector<struct pollfd> &pollFds,
     }
 }
 
-void eventLoop(const std::vector<int> &serverFds)
+void eventLoop(const std::vector<int> &serverFds, const Config *config)
 {
     std::vector<struct pollfd> pollFds;
 
@@ -61,6 +62,6 @@ void eventLoop(const std::vector<int> &serverFds)
     {
         checkClientTimeouts(pollFds);
         if (waitForEvents(pollFds) > 0)
-            processEvents(pollFds, serverFds);
+            processEvents(pollFds, serverFds, config);
     }
 }

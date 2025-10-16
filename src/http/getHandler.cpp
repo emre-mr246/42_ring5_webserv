@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/05 13:39:50 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/14 15:25:07 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/16 12:56:13 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,15 +29,19 @@ static HttpResponse createSuccessResponse(const std::string &content,
     return (response);
 }
 
-HttpResponse handleGetRequest(const std::string &uri)
+HttpResponse handleGetRequest(const HttpRequest &req, const Config *config)
 {
     std::string filePath;
     std::string content;
     std::string mimeType;
+    std::string interpreter;
 
-    filePath = resolveFilePath(uri);
+    filePath = resolveFilePath(req.uri, req, config);
     if (filePath.empty())
         return (createErrorResponse(403));
+    interpreter = getCgiInterpreter(filePath, req, config);
+    if (!interpreter.empty())
+        return (executeCgiScript(filePath, interpreter));
     if (!readFile(filePath, content))
         return (createErrorResponse(404));
     mimeType = getMimeType(filePath);

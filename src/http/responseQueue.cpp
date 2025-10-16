@@ -6,20 +6,19 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 19:48:08 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/14 15:25:06 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/16 12:56:12 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http.hpp"
 #include "webserv.hpp"
 
-struct PendingResponse
+static std::map<int, PendingResponse> &getPendingResponses(void)
 {
-    std::string data;
-    size_t offset;
-};
+    static std::map<int, PendingResponse> pendingResponses;
 
-static std::map<int, PendingResponse> gPendingResponses;
+    return (pendingResponses);
+}
 
 void setPendingResponse(int clientFd, const std::string &response)
 {
@@ -27,12 +26,12 @@ void setPendingResponse(int clientFd, const std::string &response)
 
     entry.data = response;
     entry.offset = 0;
-    gPendingResponses[clientFd] = entry;
+    getPendingResponses()[clientFd] = entry;
 }
 
 int hasPendingResponse(int clientFd)
 {
-    if (gPendingResponses.find(clientFd) != gPendingResponses.end())
+    if (getPendingResponses().find(clientFd) != getPendingResponses().end())
         return (1);
     return (0);
 }
@@ -41,20 +40,23 @@ int sendPendingResponse(int clientFd)
 {
     std::map<int, PendingResponse>::iterator it;
 
-    it = gPendingResponses.find(clientFd);
-    if (it == gPendingResponses.end())
+    it = getPendingResponses().find(clientFd);
+    if (it == getPendingResponses().end())
         return (2);
     if (!sendResponseToClient(clientFd, it->second.data, it->second.offset))
     {
-        gPendingResponses.erase(it);
+        getPendingResponses().erase(it);
         return (0);
     }
     if (it->second.offset >= it->second.data.length())
     {
-        gPendingResponses.erase(it);
+        getPendingResponses().erase(it);
         return (2);
     }
     return (1);
 }
 
-void clearPendingResponse(int clientFd) { gPendingResponses.erase(clientFd); }
+void clearPendingResponse(int clientFd)
+{
+    getPendingResponses().erase(clientFd);
+}

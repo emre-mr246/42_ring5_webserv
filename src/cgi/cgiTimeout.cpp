@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/12 00:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/14 15:25:07 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/16 12:56:13 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,17 +15,20 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-static std::map<pid_t, time_t> cgiProcesses;
+static std::map<pid_t, time_t> &getCgiProcesses(void)
+{
+    static std::map<pid_t, time_t> cgiProcesses;
+
+    return (cgiProcesses);
+}
 
 void trackCgiProcess(pid_t pid)
 {
     time_t currentTime;
 
     currentTime = time(NULL);
-    cgiProcesses[pid] = currentTime;
+    getCgiProcesses()[pid] = currentTime;
 }
-
-void removeCgiProcess(pid_t pid) { cgiProcesses.erase(pid); }
 
 int checkCgiTimeout(pid_t pid)
 {
@@ -34,14 +37,14 @@ int checkCgiTimeout(pid_t pid)
     int status;
 
     currentTime = time(NULL);
-    it = cgiProcesses.find(pid);
-    if (it != cgiProcesses.end())
+    it = getCgiProcesses().find(pid);
+    if (it != getCgiProcesses().end())
     {
         if ((currentTime - it->second) >= CGI_TIMEOUT)
         {
             kill(pid, SIGKILL);
             waitpid(pid, &status, 0);
-            removeCgiProcess(pid);
+            getCgiProcesses().erase(pid);
             return (1);
         }
     }

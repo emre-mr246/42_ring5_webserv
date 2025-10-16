@@ -1,56 +1,45 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   fileReader.cpp                                     :+:      :+:    :+:   */
+/*   cgiExecutor.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/05 13:39:50 by emgul            #+#    #+#              */
+/*   Created: 2025/10/14 16:00:00 by emgul            #+#    #+#              */
 /*   Updated: 2025/10/16 12:56:13 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http.hpp"
 #include "webserv.hpp"
-#include <sys/stat.h>
+#include <cstdlib>
+#include <sstream>
+#include <sys/wait.h>
+#include <unistd.h>
 
-static int checkFileExists(const std::string &path)
+std::string readCgiOutput(int fd)
 {
-    struct stat fileInfo;
-
-    if (stat(path.c_str(), &fileInfo) == -1)
-        return (0);
-    if (S_ISDIR(fileInfo.st_mode))
-        return (0);
-    return (1);
-}
-
-static std::string readFileContent(int fd)
-{
-    std::string content;
-    char buf[4096];
+    std::string output;
+    char buffer[4096];
     ssize_t bytesRead;
 
     while (1)
     {
-        bytesRead = read(fd, buf, sizeof(buf));
+        bytesRead = read(fd, buffer, sizeof(buffer) - 1);
         if (bytesRead <= 0)
             break;
-        content.append(buf, bytesRead);
+        buffer[bytesRead] = '\0';
+        output.append(buffer, bytesRead);
     }
-    return (content);
+    return (output);
 }
 
-int readFile(const std::string &path, std::string &content)
+HttpResponse executeCgiScript(const std::string &scriptPath,
+                              const std::string &interpreter)
 {
-    int fd;
+    int pipefd[2];
 
-    if (!checkFileExists(path))
-        return (0);
-    fd = open(path.c_str(), O_RDONLY);
-    if (fd == -1)
-        return (0);
-    content = readFileContent(fd);
-    close(fd);
-    return (1);
+    if (pipe(pipefd) == -1)
+        return (createErrorResponse(500));
+    return (runCgiProcess(pipefd, scriptPath, interpreter));
 }

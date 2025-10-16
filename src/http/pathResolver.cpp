@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/05 13:39:50 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/14 15:25:06 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/16 12:56:12 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,17 +36,31 @@ static int isPathSafe(const std::string &uri)
     return (1);
 }
 
-std::string resolveFilePath(const std::string &uri)
+static std::string buildPath(const std::string &uri, const std::string &root,
+                             const std::string &index)
 {
-    std::string root;
     std::string path;
 
-    root = "./www";
-    if (!isPathSafe(uri))
-        return ("");
     if (uri == "/")
-        path = root + "/index.html";
+    {
+        if (!index.empty())
+            path = root + "/" + index;
+        else
+            path = root + "/index.html";
+    }
     else
         path = root + uri;
     return (path);
+}
+
+std::string resolveFilePath(const std::string &uri, const HttpRequest &req,
+                            const Config *config)
+{
+    std::string root;
+    std::string index;
+
+    if (!isPathSafe(uri))
+        return ("");
+    getLocationSettings(req, config, root, index);
+    return (buildPath(uri, root, index));
 }

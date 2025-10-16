@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:35 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/14 15:25:06 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/16 12:56:12 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ static std::string getErrorMessage(int code)
         return ("Payload Too Large");
     if (code == 500)
         return ("Internal Server Error");
+    if (code == 504)
+        return ("Gateway Timeout");
     return ("Error");
 }
 
