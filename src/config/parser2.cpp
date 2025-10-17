@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 22:14:28 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/16 12:56:13 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/17 08:33:09 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,8 @@ void parseServerDirective(const std::string &line, ServerConfig &server)
     }
     else if (trimmed.find("server_name") == 0)
         server.serverNames = extractServerNames(line);
+    else if (trimmed.find("root") == 0)
+        server.root = extractRoot(line);
     else if (trimmed.find("client_max_body_size") == 0)
         server.clientMaxBodySize = extractBodySize(line);
     else if (trimmed.find("error_page") == 0)

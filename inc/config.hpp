@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 21:32:43 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/16 12:56:13 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/17 08:33:09 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ struct ServerConfig
 {
     std::vector<std::pair<std::string, int> > listenOn;
     std::vector<std::string> serverNames;
+    std::string root;
     std::map<int, std::string> errorPages;
     size_t clientMaxBodySize;
     std::vector<LocationConfig> locations;

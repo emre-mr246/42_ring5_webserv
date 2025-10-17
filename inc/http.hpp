@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:36 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/16 12:56:13 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/17 08:33:09 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,16 @@ const ServerConfig *findServerByHost(const Config *config,
                                      const std::string &host, int port);
 std::string stripPortFromHost(const std::string &host);
 int getPortFromSocket(int serverFd);
+const LocationConfig *findLocation(const HttpRequest &req,
+                                   const Config *config);
+const ServerConfig *findServerForRequest(const HttpRequest &req,
+                                         const Config *config);
+void resolveRoot(const LocationConfig *location, const ServerConfig *server,
+                 std::string &root);
+std::string getHostFromRequest(const HttpRequest &req);
+int getPortFromHostHeader(const HttpRequest &req);
+const ServerConfig *findServerByPort(const Config *config, int port);
+const LocationConfig *getDefaultLocation(const Config *config);
 int readFile(const std::string &path, std::string &content);
 int writeFile(const std::string &path, const std::string &content);
 std::string getMimeType(const std::string &path);

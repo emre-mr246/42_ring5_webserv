@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 03:47:21 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/16 12:56:13 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/17 08:33:09 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ int main(int argc, char **argv)
         return (1);
     if (!serverConfig.loadConfig(configPath))
         return (1);
+    printConfig(serverConfig);
     gatherAddresses(serverConfig, addresses);
     if (!openServerSockets(addresses, serverFds))
         return (1);
