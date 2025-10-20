@@ -6,14 +6,13 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 20:20:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/17 08:33:09 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-void addUniqueAddress(std::vector<std::pair<std::string, int> > &addresses,
-                      const std::string &host, int port)
+void addUniqueAddress(std::vector<std::pair<std::string, int> > &addresses, const std::string &host, int port)
 {
     size_t i;
 
@@ -27,8 +26,7 @@ void addUniqueAddress(std::vector<std::pair<std::string, int> > &addresses,
     addresses.push_back(std::make_pair(host, port));
 }
 
-void gatherAddresses(const Config &config,
-                     std::vector<std::pair<std::string, int> > &addresses)
+void gatherAddresses(const Config &config, std::vector<std::pair<std::string, int> > &addresses)
 {
     const std::vector<ServerConfig> &servers = config.getServerConfigs();
     size_t i;
@@ -47,11 +45,10 @@ void gatherAddresses(const Config &config,
         i++;
     }
     if (addresses.empty())
-        addUniqueAddress(addresses, "0.0.0.0", PORT);
+        addUniqueAddress(addresses, "0.0.0.0", 8080);
 }
 
-int openServerSockets(const std::vector<std::pair<std::string, int> > &addresses,
-                      std::vector<int> &fds)
+int openServerSockets(const std::vector<std::pair<std::string, int> > &addresses, std::vector<int> &fds)
 {
     size_t i;
     int fd;

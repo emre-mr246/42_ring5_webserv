@@ -6,14 +6,13 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:15:47 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/17 08:33:09 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-void initPollServer(std::vector<struct pollfd> &pollFds,
-                    const std::vector<int> &serverFds)
+void initPollServer(std::vector<struct pollfd> &pollFds, const std::vector<int> &serverFds)
 {
     struct pollfd entry;
     size_t i;

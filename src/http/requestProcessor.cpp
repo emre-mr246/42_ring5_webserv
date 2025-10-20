@@ -6,32 +6,29 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:35 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/17 08:33:08 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/20 19:54:02 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http.hpp"
 #include "webserv.hpp"
 
-static size_t findHeaderEnd(const std::string &buffer)
+static std::string trimCarriageReturn(const std::string &str)
 {
-    size_t pos;
+    size_t len;
 
-    pos = buffer.find("\r\n\r\n");
-    if (pos != std::string::npos)
-        return (pos + 4);
-    pos = buffer.find("\n\n");
-    if (pos != std::string::npos)
-        return (pos + 2);
-    return (std::string::npos);
+    len = str.length();
+    if (len > 0 && str[len - 1] == '\r')
+        return (str.substr(0, len - 1));
+    return (str);
 }
 
-static void extractLines(const char *data, size_t len,
-                         std::vector<std::string> &lines)
+static void extractLines(const char *data, size_t len, std::vector<std::string> &lines)
 {
     std::string buffer;
     size_t i;
     size_t pos;
+    std::string line;
 
     buffer = std::string(data, len);
     i = 0;
@@ -40,7 +37,8 @@ static void extractLines(const char *data, size_t len,
         pos = buffer.find('\n', i);
         if (pos == std::string::npos)
             break;
-        lines.push_back(buffer.substr(i, pos - i));
+        line = buffer.substr(i, pos - i);
+        lines.push_back(trimCarriageReturn(line));
         i = pos + 1;
     }
 }
@@ -50,6 +48,8 @@ static int isChunkedEncoding(const HttpRequest &req)
     std::map<std::string, std::string>::const_iterator it;
 
     it = req.headers.find("Transfer-Encoding");
+    if (it == req.headers.end())
+        it = req.headers.find("transfer-encoding");
     if (it != req.headers.end())
     {
         if (it->second.find("chunked") != std::string::npos)
@@ -77,19 +77,19 @@ int processRequestData(const char *data, size_t len, HttpRequest &req)
 {
     std::vector<std::string> lines;
     size_t i;
-    size_t maxSize;
 
-    maxSize = 1048576;
-    if (len > maxSize)
-        return (0);
     extractLines(data, len, lines);
     if (lines.empty())
         return (0);
-    parseRequestLine(lines[0], req);
+    if (!parseRequestLine(lines[0], req))
+        return (0);
     i = 1;
     while (i < lines.size())
     {
-        parseHeader(lines[i], req);
+        if (lines[i].empty())
+            break;
+        if (!parseHeader(lines[i], req))
+            return (0);
         i++;
     }
     extractBody(data, len, req);

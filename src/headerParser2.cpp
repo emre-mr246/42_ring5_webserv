@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   headerParser.cpp                                   :+:      :+:    :+:   */
+/*   headerParser2.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/04 21:29:35 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/17 08:33:08 by emgul            ###   ########.fr       */
+/*   Created: 2025/10/19 14:30:00 by emgul            #+#    #+#              */
+/*   Updated: 2025/10/20 19:54:02 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ static int extractHeaderName(const std::string &line, std::string &name)
     return (1);
 }
 
-static std::string extractHeaderValue(const std::string &line)
+static std::string extractHeaderValueForRequest(const std::string &line)
 {
     size_t pos;
     std::string value;
@@ -36,8 +36,7 @@ static std::string extractHeaderValue(const std::string &line)
     return (strtrim(value));
 }
 
-static int isHeaderSizeValid(const std::string &name,
-                             const std::string &value)
+static int isHeaderSizeValid(const std::string &name, const std::string &value)
 {
     size_t maxNameLen;
     size_t maxValueLen;
@@ -60,7 +59,7 @@ int parseHeader(const std::string &line, HttpRequest &req)
         return (1);
     if (!extractHeaderName(line, name))
         return (0);
-    value = extractHeaderValue(line);
+    value = extractHeaderValueForRequest(line);
     if (!isHeaderSizeValid(name, value))
         return (0);
     req.headers[name] = value;

@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/08 13:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/17 08:33:08 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/20 19:54:02 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,8 @@ static std::string extractUploadFileName(const HttpRequest &req)
     std::string headerName;
 
     it = req.headers.find("Content-Disposition");
+    if (it == req.headers.end())
+        it = req.headers.find("content-disposition");
     if (it != req.headers.end())
     {
         disposition = it->second;
@@ -75,6 +77,8 @@ static std::string extractUploadFileName(const HttpRequest &req)
     if (headerName.empty())
     {
         it = req.headers.find("X-File-Name");
+        if (it == req.headers.end())
+            it = req.headers.find("x-file-name");
         if (it != req.headers.end() && !it->second.empty())
             headerName = it->second;
     }
@@ -99,16 +103,23 @@ static HttpResponse createPostSuccessResponse(void)
     return (response);
 }
 
-HttpResponse handlePostRequest(const HttpRequest &req)
+HttpResponse handlePostRequest(const HttpRequest &req, const Config *config)
 {
     std::string fileName;
     std::string filePath;
+    std::string uploadPath;
+    const LocationConfig *location;
     int result;
 
     if (req.body.empty())
         return (createErrorResponse(400));
+    location = findLocation(req, config);
+    if (location && !location->uploadPath.empty())
+        uploadPath = location->uploadPath;
+    else
+        uploadPath = "./uploads";
     fileName = extractUploadFileName(req);
-    filePath = "./uploads/" + fileName;
+    filePath = uploadPath + "/" + fileName;
     result = writeFile(filePath, req.body);
     if (!result)
         return (createErrorResponse(500));

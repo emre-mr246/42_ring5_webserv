@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 21:32:43 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/17 08:33:09 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,12 +25,11 @@ struct LocationConfig
     std::string path;
     std::string root;
     std::string indexFile;
-    bool autoindex;
     std::vector<std::string> acceptedMethods;
-    std::pair<int, std::string> redirect;
     std::string uploadPath;
     size_t clientMaxBodySize;
     std::map<std::string, std::string> cgiPass;
+    std::map<int, std::string> errorPages;
 };
 
 struct ServerConfig
@@ -64,10 +63,12 @@ class Config
     const std::vector<ServerConfig> &getServerConfigs() const;
 };
 
-int readConfigFile(const std::string &filePath,
-                   std::vector<ServerConfig> &serverConfigs);
-void parserConfig(std::ifstream &configFile,
-                  std::vector<ServerConfig> &serverConfigs);
+int readConfigFile(const std::string &filePath, std::vector<ServerConfig> &serverConfigs);
+void parserConfig(std::ifstream &configFile, std::vector<ServerConfig> &serverConfigs);
+void initConfigState(configData &state);
+void updateServerBlockState(const std::string &line, configData &state, std::vector<ServerConfig> &all);
+void processConfigLine(const std::string &line, configData &state, std::vector<ServerConfig> &serverConfigs);
+void finalizeConfigParsing(configData &state, std::vector<ServerConfig> &serverConfigs);
 int isComment(const std::string &line);
 bool isServerBlock(const std::string &line);
 bool isLocationBlock(const std::string &line);
@@ -78,18 +79,16 @@ int parseBodySize(const std::string &s);
 int parsePort(const std::string &s);
 void addListenAddress(const std::string &value, ServerConfig &server);
 void addErrorPages(const std::string &value, ServerConfig &server);
+void addErrorPages(const std::string &value, LocationConfig &location);
 void parseLocationDirective(const std::string &line, LocationConfig &location);
 void parseServerDirective(const std::string &line, ServerConfig &server);
-int isValidLocationDirective(const std::string &line, int depth,
-                             bool inLocation);
+int isValidLocationDirective(const std::string &line, int depth, bool inLocation);
 int isValidServerDirective(const std::string &line, int depth, bool inLocation);
 std::string extractLocationPath(const std::string &line);
 std::vector<std::string> extractAcceptedMethods(const std::string &line);
 std::string extractRoot(const std::string &line);
 std::string extractIndex(const std::string &line);
-bool extractAutoindex(const std::string &line);
 std::string extractUploadPath(const std::string &line);
-std::pair<int, std::string> extractRedirect(const std::string &line);
 void addCgiPass(const std::string &line, LocationConfig &location);
 std::vector<std::string> extractServerNames(const std::string &line);
 int validateServerConfig(const ServerConfig &server);

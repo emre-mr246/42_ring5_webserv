@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 12:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/17 08:33:08 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/20 19:54:02 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ std::string getHostFromRequest(const HttpRequest &req)
     std::map<std::string, std::string>::const_iterator hostIt;
 
     hostIt = req.headers.find("Host");
+    if (hostIt == req.headers.end())
+        hostIt = req.headers.find("host");
     if (hostIt != req.headers.end())
         return (stripPortFromHost(hostIt->second));
     return ("");
@@ -49,6 +51,8 @@ int getPortFromHostHeader(const HttpRequest &req)
 
     hostIt = req.headers.find("Host");
     if (hostIt == req.headers.end())
+        hostIt = req.headers.find("host");
+    if (hostIt == req.headers.end())
         return (80);
     host = hostIt->second;
     colonPos = host.find(':');
@@ -76,29 +80,4 @@ const ServerConfig *findServerByPort(const Config *config, int port)
         it++;
     }
     return (NULL);
-}
-
-const LocationConfig *findLocation(const HttpRequest &req,
-                                   const Config *config)
-{
-    std::string host;
-    const ServerConfig *server;
-    int port;
-
-    if (!config)
-        return (NULL);
-    host = getHostFromRequest(req);
-    port = getPortFromHostHeader(req);
-    if (port == -1)
-        return (getDefaultLocation(config));
-    server = findServerByHost(config, host, port);
-    if (!server)
-        server = findServerByPort(config, port);
-    if (server)
-    {
-        if (!server->locations.empty())
-            return (&server->locations[0]);
-        return (NULL);
-    }
-    return (getDefaultLocation(config));
 }

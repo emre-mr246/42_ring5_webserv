@@ -6,14 +6,13 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 14:49:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/17 08:33:09 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-static void addMethodToList(const std::string &value, size_t &start,
-                            std::vector<std::string> &methods)
+static void addMethodToList(const std::string &value, size_t &start, std::vector<std::string> &methods)
 {
     size_t end;
     std::string method;
@@ -58,30 +57,6 @@ std::string extractUploadPath(const std::string &line)
     if (!value.empty() && value[value.length() - 1] == ';')
         value.resize(value.length() - 1);
     return (strtrim(value));
-}
-
-std::pair<int, std::string> extractRedirect(const std::string &line)
-{
-    std::string value;
-    std::string codeStr;
-    std::string url;
-    size_t pos;
-    size_t spacePos;
-    int code;
-
-    pos = line.find("redirect");
-    if (pos == std::string::npos)
-        return (std::make_pair(0, ""));
-    value = strtrim(line.substr(pos + 8));
-    if (!value.empty() && value[value.length() - 1] == ';')
-        value.resize(value.length() - 1);
-    spacePos = value.find(' ');
-    if (spacePos == std::string::npos)
-        return (std::make_pair(0, ""));
-    codeStr = strtrim(value.substr(0, spacePos));
-    url = strtrim(value.substr(spacePos + 1));
-    code = parseBodySize(codeStr);
-    return (std::make_pair(code, url));
 }
 
 void addCgiPass(const std::string &line, LocationConfig &location)

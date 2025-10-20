@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 22:14:28 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/17 08:33:08 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,7 @@ void addListenAddress(const std::string &value, ServerConfig &server)
     }
 }
 
-static void parseErrorCodes(const std::string &codes, const std::string &path,
-                            ServerConfig &server)
+static void parseCodesHelper(const std::string &codes, std::map<int, std::string> &errorPages, const std::string &path)
 {
     std::string codeStr;
     int code;
@@ -61,7 +60,7 @@ static void parseErrorCodes(const std::string &codes, const std::string &path,
         {
             code = parseBodySize(codeStr);
             if (code > 0)
-                server.errorPages[code] = path;
+                errorPages[code] = path;
         }
         start = end + 1;
     }
@@ -80,5 +79,21 @@ void addErrorPages(const std::string &value, ServerConfig &server)
         return;
     codes = strtrim(value.substr(0, spacePos));
     path = strtrim(value.substr(spacePos + 1));
-    parseErrorCodes(codes, path, server);
+    parseCodesHelper(codes, server.errorPages, path);
+}
+
+void addErrorPages(const std::string &value, LocationConfig &location)
+{
+    size_t spacePos;
+    std::string codes;
+    std::string path;
+
+    if (value.empty())
+        return;
+    spacePos = value.find_last_of(' ');
+    if (spacePos == std::string::npos)
+        return;
+    codes = strtrim(value.substr(0, spacePos));
+    path = strtrim(value.substr(spacePos + 1));
+    parseCodesHelper(codes, location.errorPages, path);
 }

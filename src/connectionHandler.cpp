@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:12:19 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/17 08:33:09 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,40 +38,25 @@ void handleNewConnection(std::vector<struct pollfd> &pollFds, int serverFd)
     addClientToPoll(pollFds, clientFd);
 }
 
-static void handleRequest(const HttpRequest &req, int clientFd,
-                          std::vector<struct pollfd> &pollFds,
-                          const Config *config)
-{
-    HttpResponse response;
-    std::string responseStr;
-
-    if (!validateHttpRequest(req))
-        response = createErrorResponse(400);
-    else if (req.method == "GET")
-        response = handleGetRequest(req, config);
-    else if (req.method == "POST")
-        response = handlePostRequest(req);
-    else if (req.method == "DELETE")
-        response = handleDeleteRequest(req, config);
-    else
-        response = createErrorResponse(405);
-    responseStr = buildHttpResponse(response);
-    setPendingResponse(clientFd, responseStr);
-    updateClientEvents(pollFds, clientFd, POLLIN | POLLOUT);
-}
-
-static void parseAndHandleRequest(const char *buf, ssize_t bytesRead,
-                                  int clientFd,
-                                  std::vector<struct pollfd> &pollFds,
-                                  const Config *config)
+void parseAndHandleRequest(const char *buf, ssize_t bytesRead,
+                           int clientFd,
+                           std::vector<struct pollfd> &pollFds,
+                           const Config *config)
 {
     HttpRequest req;
     HttpResponse response;
     std::string responseStr;
 
+    if (!validateRequestSize(buf, bytesRead, clientFd, pollFds))
+        return;
     if (!processRequestData(buf, bytesRead, req))
     {
-        response = createErrorResponse(413);
+        handleParseError(buf, bytesRead, clientFd, pollFds);
+        return;
+    }
+    if (!checkBodySizeLimit(req, config))
+    {
+        response = createErrorResponse(413, req, config);
         responseStr = buildHttpResponse(response);
         setPendingResponse(clientFd, responseStr);
         updateClientEvents(pollFds, clientFd, POLLIN | POLLOUT);
@@ -81,20 +66,66 @@ static void parseAndHandleRequest(const char *buf, ssize_t bytesRead,
     handleRequest(req, clientFd, pollFds, config);
 }
 
-int readFromClient(int clientFd, std::vector<struct pollfd> &pollFds,
-                   const Config *config)
+static void sendBodySizeError(int clientFd, std::vector<struct pollfd> &pollFds,
+                              const HttpRequest &tempReq, const Config *config)
+{
+    HttpResponse response;
+    std::string responseStr;
+
+    response = createErrorResponse(413, tempReq, config);
+    responseStr = buildHttpResponse(response);
+    setPendingResponse(clientFd, responseStr);
+    updateClientEvents(pollFds, clientFd, POLLIN | POLLOUT);
+    clearClientBuffer(clientFd);
+}
+
+void checkHeadersForBodySize(int clientFd, std::vector<struct pollfd> &pollFds,
+                             const Config *config, int *shouldContinue)
+{
+    HttpRequest tempReq;
+    std::string &clientBuffer = getClientBuffer(clientFd);
+    size_t contentLength;
+    size_t maxSize;
+
+    *shouldContinue = 1;
+    contentLength = parseContentLength(clientBuffer);
+    if (contentLength == 0)
+        return;
+    if (contentLength > MAX_REQUEST_BUFFER)
+    {
+        sendErrorAndStop(clientFd, pollFds, 413, shouldContinue);
+        return;
+    }
+    if (!processRequestData(clientBuffer.c_str(), clientBuffer.length(), tempReq))
+        return;
+    maxSize = getMaxBodySize(tempReq, config);
+    if (contentLength > maxSize)
+    {
+        sendBodySizeError(clientFd, pollFds, tempReq, config);
+        *shouldContinue = 0;
+    }
+}
+
+int readFromClient(int clientFd, std::vector<struct pollfd> &pollFds, const Config *config)
 {
     char buf[4096];
     ssize_t bytesRead;
+    int wasHeadersParsed;
 
     bytesRead = read(clientFd, buf, sizeof(buf));
     if (bytesRead > 0)
     {
+        std::string &clientBuffer = getClientBuffer(clientFd);
+
         updateClientTime(clientFd);
-        parseAndHandleRequest(buf, bytesRead, clientFd, pollFds, config);
-        return (1);
+        wasHeadersParsed = areHeadersParsed(clientFd);
+        clientBuffer.append(buf, bytesRead);
+        return (processNewData(clientFd, pollFds, config, wasHeadersParsed));
     }
     if (bytesRead == 0)
+    {
+        clearClientBuffer(clientFd);
         return (0);
+    }
     return (1);
 }

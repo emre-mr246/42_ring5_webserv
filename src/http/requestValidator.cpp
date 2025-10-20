@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:35 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/17 08:33:08 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,14 @@ static int isValidMethod(const std::string &method)
     if (method == "POST")
         return (1);
     if (method == "DELETE")
+        return (1);
+    if (method == "PUT")
+        return (1);
+    if (method == "HEAD")
+        return (1);
+    if (method == "OPTIONS")
+        return (1);
+    if (method == "PATCH")
         return (1);
     return (0);
 }

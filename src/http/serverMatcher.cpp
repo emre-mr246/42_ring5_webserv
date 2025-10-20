@@ -6,14 +6,12 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 12:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/17 08:33:08 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http.hpp"
 #include "webserv.hpp"
-#include <arpa/inet.h>
-#include <sys/socket.h>
 
 std::string stripPortFromHost(const std::string &host)
 {
@@ -23,17 +21,6 @@ std::string stripPortFromHost(const std::string &host)
     if (colonPos != std::string::npos)
         return (host.substr(0, colonPos));
     return (host);
-}
-
-int getPortFromSocket(int serverFd)
-{
-    struct sockaddr_in addr;
-    socklen_t addrLen;
-
-    addrLen = sizeof(addr);
-    if (getsockname(serverFd, (struct sockaddr *)&addr, &addrLen) == -1)
-        return (-1);
-    return (ntohs(addr.sin_port));
 }
 
 static int serverMatchesPort(const ServerConfig &server, int port)

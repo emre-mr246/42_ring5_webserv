@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 12:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/17 08:33:09 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,38 @@ static void parseHeader(const std::string &line, HttpResponse &response)
     response.headers[key] = value;
 }
 
-static void parseHeaders(const std::string &headers, HttpResponse &response)
+static int extractStatusCode(const std::string &statusValue)
+{
+    size_t i;
+    int result;
+
+    i = 0;
+    result = 0;
+    while (i < statusValue.length() && (statusValue[i] == ' ' || statusValue[i] == '\t'))
+        i++;
+    while (i < statusValue.length() && statusValue[i] >= '0' && statusValue[i] <= '9')
+    {
+        result = result * 10 + (statusValue[i] - '0');
+        i++;
+    }
+    if (result == 0)
+        return (200);
+    return (result);
+}
+
+void processStatusHeaderFromCgi(HttpResponse &response)
+{
+    std::map<std::string, std::string>::iterator it;
+
+    it = response.headers.find("Status");
+    if (it != response.headers.end())
+    {
+        response.statusCode = extractStatusCode(it->second);
+        response.headers.erase("Status");
+    }
+}
+
+void parseHeadersFromCgi(const std::string &headers, HttpResponse &response)
 {
     size_t pos;
     size_t start;
@@ -45,43 +76,4 @@ static void parseHeaders(const std::string &headers, HttpResponse &response)
             parseHeader(headers.substr(start, pos - start), response);
         start = pos + 1;
     }
-}
-
-static HttpResponse buildSimpleResponse(const std::string &output)
-{
-    HttpResponse response;
-    std::ostringstream oss;
-
-    response.statusCode = 200;
-    response.statusMessage = "OK";
-    response.body = output;
-    response.headers["Content-Type"] = "text/html";
-    oss << output.length();
-    response.headers["Content-Length"] = oss.str();
-    return (response);
-}
-
-HttpResponse parseCgiOutput(const std::string &output)
-{
-    HttpResponse response;
-    size_t headerEnd;
-    std::string headers;
-    std::string body;
-    std::ostringstream oss;
-
-    headerEnd = output.find("\n\n");
-    if (headerEnd == std::string::npos)
-        return (buildSimpleResponse(output));
-    response.statusCode = 200;
-    response.statusMessage = "OK";
-    headers = output.substr(0, headerEnd);
-    body = output.substr(headerEnd + 2);
-    response.body = body;
-    parseHeaders(headers, response);
-    if (response.headers.find("Content-Length") == response.headers.end())
-    {
-        oss << body.length();
-        response.headers["Content-Length"] = oss.str();
-    }
-    return (response);
 }

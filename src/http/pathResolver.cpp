@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/05 13:39:50 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/17 08:33:08 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/20 19:54:02 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,7 @@ static int isPathSafe(const std::string &uri)
     return (1);
 }
 
-static std::string buildPath(const std::string &uri, const std::string &root,
-                             const std::string &index)
+static std::string buildPath(const std::string &uri, const std::string &root, const std::string &index)
 {
     std::string path;
 
@@ -53,14 +52,20 @@ static std::string buildPath(const std::string &uri, const std::string &root,
     return (path);
 }
 
-std::string resolveFilePath(const std::string &uri, const HttpRequest &req,
-                            const Config *config)
+std::string resolveFilePath(const std::string &uri, const HttpRequest &req, const Config *config)
 {
     std::string root;
     std::string index;
+    std::string cleanUri;
+    size_t qPos;
 
-    if (!isPathSafe(uri))
+    qPos = uri.find('?');
+    if (qPos == std::string::npos)
+        cleanUri = uri;
+    else
+        cleanUri = uri.substr(0, qPos);
+    if (!isPathSafe(cleanUri))
         return ("");
     getLocationSettings(req, config, root, index);
-    return (buildPath(uri, root, index));
+    return (buildPath(cleanUri, root, index));
 }

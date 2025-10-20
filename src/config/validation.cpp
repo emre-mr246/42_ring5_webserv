@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 13:21:54 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/17 08:33:09 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,7 @@ static int validatePort(int port)
     return (0);
 }
 
-static int checkDuplicateServer(const ServerConfig &s1,
-                                const ServerConfig &s2)
+static int checkDuplicateServer(const ServerConfig &s1, const ServerConfig &s2)
 {
     size_t i;
     size_t j;

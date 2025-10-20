@@ -6,31 +6,12 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:35 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/17 08:33:08 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/20 19:54:02 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http.hpp"
 #include <sstream>
-
-static std::string getErrorMessage(int code)
-{
-    if (code == 400)
-        return ("Bad Request");
-    if (code == 403)
-        return ("Forbidden");
-    if (code == 404)
-        return ("Not Found");
-    if (code == 405)
-        return ("Method Not Allowed");
-    if (code == 413)
-        return ("Payload Too Large");
-    if (code == 500)
-        return ("Internal Server Error");
-    if (code == 504)
-        return ("Gateway Timeout");
-    return ("Error");
-}
 
 static std::string buildErrorBody(int code, const std::string &message)
 {
@@ -53,4 +34,33 @@ HttpResponse createErrorResponse(int statusCode)
     response.headers["Content-Length"] = oss.str();
     response.headers["Content-Type"] = "text/html";
     return (response);
+}
+
+HttpResponse buildCustomError(int code, const std::string &content)
+{
+    HttpResponse response;
+    std::ostringstream oss;
+
+    response.statusCode = code;
+    response.statusMessage = getErrorMessage(code);
+    response.body = content;
+    oss << response.body.length();
+    response.headers["Content-Length"] = oss.str();
+    response.headers["Content-Type"] = "text/html";
+    return (response);
+}
+
+HttpResponse createErrorResponse(int statusCode, const HttpRequest &req,
+                                 const Config *config)
+{
+    std::string content;
+    int result;
+
+    result = tryLocationErrorPage(statusCode, req, config, content);
+    if (result == 1)
+        return (buildCustomError(statusCode, content));
+    result = tryServerErrorPage(statusCode, req, config, content);
+    if (result == 1)
+        return (buildCustomError(statusCode, content));
+    return (createErrorResponse(statusCode));
 }

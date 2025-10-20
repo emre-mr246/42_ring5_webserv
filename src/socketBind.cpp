@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/12 17:19:27 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/17 08:33:08 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/20 19:54:02 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,7 @@ int bindServerSocket(int fd, const std::string &host, int port, int backlog)
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
     portStr << port;
-    if (getaddrinfo(host.empty() ? NULL : host.c_str(), portStr.str().c_str(),
-                    &hints, &res) != 0)
+    if (getaddrinfo(host.empty() ? NULL : host.c_str(), portStr.str().c_str(), &hints, &res) != 0)
         return (-1);
     it = res;
     while (it)

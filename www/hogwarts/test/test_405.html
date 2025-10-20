@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Testing 405 Method Not Allowed</title>
+    <script>
+        window.onload = function() {
+            fetch('/upload/', {
+                method: 'GET'
+            }).then(response => {
+                window.location.href = '/upload/';
+            });
+        };
+    </script>
+</head>
+<body>
+    <p>Redirecting to test 405...</p>
+</body>
+</html>

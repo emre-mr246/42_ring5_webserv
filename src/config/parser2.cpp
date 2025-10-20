@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 22:14:28 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/17 08:33:09 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,14 +25,12 @@ void parseLocationDirective(const std::string &line, LocationConfig &location)
         location.root = extractRoot(line);
     else if (trimmed.find("index") == 0)
         location.indexFile = extractIndex(line);
-    else if (trimmed.find("autoindex") == 0)
-        location.autoindex = extractAutoindex(line);
     else if (trimmed.find("upload_path") == 0)
         location.uploadPath = extractUploadPath(line);
-    else if (trimmed.find("redirect") == 0)
-        location.redirect = extractRedirect(line);
     else if (trimmed.find("cgi_pass") == 0)
         addCgiPass(line, location);
+    else if (trimmed.find("error_page") == 0)
+        addErrorPages(extractErrorPageValue(line), location);
 }
 
 void parseServerDirective(const std::string &line, ServerConfig &server)

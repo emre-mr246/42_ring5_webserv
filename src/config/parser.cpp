@@ -6,14 +6,13 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 22:14:28 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/17 08:33:09 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-static void handleClosingBrace(configData &state,
-                               std::vector<ServerConfig> &all)
+static void handleClosingBrace(configData &state, std::vector<ServerConfig> &all)
 {
     if (state.depth == 1 && state.inLocation)
     {
@@ -45,13 +44,12 @@ static void initLocation(LocationConfig &loc, const std::string &line)
     loc = LocationConfig();
     loc.path = extractLocationPath(line);
     loc.clientMaxBodySize = 1048576;
-    loc.autoindex = false;
     loc.indexFile = "index.html";
     loc.acceptedMethods.push_back("GET");
 }
 
-static void updateServerBlockState(const std::string &line, configData &state,
-                                   std::vector<ServerConfig> &all)
+void updateServerBlockState(const std::string &line, configData &state,
+                            std::vector<ServerConfig> &all)
 {
     if (isServerBlock(line))
     {
@@ -78,29 +76,12 @@ void parserConfig(std::ifstream &configFile,
     configData state;
     std::string line;
 
-    state.depth = -1;
-    state.inLocation = false;
-    state.currentServer.clientMaxBodySize = 1048576;
-    state.currentLocation.clientMaxBodySize = 1048576;
-    state.currentLocation.autoindex = false;
-    state.currentLocation.indexFile = "index.html";
-    state.currentLocation.acceptedMethods.push_back("GET");
+    initConfigState(state);
     serverConfigs.clear();
     while (std::getline(configFile, line))
     {
         line = strtrim(line);
-        if (line.empty() || isComment(line))
-            continue;
-        updateServerBlockState(line, state, serverConfigs);
-        if (isValidServerDirective(line, state.depth, state.inLocation))
-            parseServerDirective(line, state.currentServer);
-        else if (isValidLocationDirective(line, state.depth, state.inLocation))
-            parseLocationDirective(line, state.currentLocation);
+        processConfigLine(line, state, serverConfigs);
     }
-    if (state.depth >= 0)
-    {
-        if (state.inLocation)
-            state.currentServer.locations.push_back(state.currentLocation);
-        serverConfigs.push_back(state.currentServer);
-    }
+    finalizeConfigParsing(state, serverConfigs);
 }

@@ -6,11 +6,13 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 10:51:54 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/17 08:33:09 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
+
+struct HttpRequest;
 
 #include "config.hpp"
 #include <arpa/inet.h>
@@ -28,13 +30,25 @@
 #include <unistd.h>
 #include <vector>
 
-#define PORT 8080
 #define BACKLOG 42
-#define DEBUG_MODE 1
-#define CLIENT_TIMEOUT 60
-#define CGI_TIMEOUT 60
+#define CLIENT_TIMEOUT 30
+#define CGI_TIMEOUT 15
+#define MAX_REQUEST_BUFFER 10485760
+
+struct ClientRequestBuffer
+{
+    std::string buffer;
+    int headersParsed;
+    size_t expectedBodySize;
+};
 
 void printError(const std::string &context);
+std::string &getClientBuffer(int clientFd);
+void clearClientBuffer(int clientFd);
+int areHeadersParsed(int clientFd);
+int isRequestComplete(int clientFd);
+size_t parseContentLength(const std::string &headers);
+size_t findHeaderEnd(const std::string &buffer);
 int createListeningSocket(const std::string &host, int port);
 int bindServerSocket(int fd, const std::string &host, int port, int backlog);
 int setNonblocking(int fd);
@@ -55,6 +69,23 @@ int acceptClientConnection(int serverFd);
 void handleNewConnection(std::vector<struct pollfd> &pollFds, int serverFd);
 int readFromClient(int clientFd, std::vector<struct pollfd> &pollFds,
                    const Config *config);
+int processNewData(int clientFd, std::vector<struct pollfd> &pollFds,
+                   const Config *config, int wasHeadersParsed);
+int validateRequestSize(const char *buf, ssize_t bytesRead, int clientFd,
+                        std::vector<struct pollfd> &pollFds);
+void handleParseError(const char *buf, ssize_t bytesRead, int clientFd,
+                      std::vector<struct pollfd> &pollFds);
+size_t getMaxBodySize(const HttpRequest &req, const Config *config);
+int checkBodySizeLimit(const HttpRequest &req, const Config *config);
+void handleRequest(const HttpRequest &req, int clientFd,
+                   std::vector<struct pollfd> &pollFds, const Config *config);
+void sendErrorAndStop(int clientFd, std::vector<struct pollfd> &pollFds,
+                      int statusCode, int *shouldContinue);
+void checkHeadersForBodySize(int clientFd, std::vector<struct pollfd> &pollFds,
+                             const Config *config, int *shouldContinue);
+void parseAndHandleRequest(const char *buf, ssize_t bytesRead, int clientFd,
+                           std::vector<struct pollfd> &pollFds,
+                           const Config *config);
 int handleClientData(std::vector<struct pollfd> &pollFds, size_t clientIndex,
                      const Config *config);
 int handleClientWrite(std::vector<struct pollfd> &pollFds, size_t clientIndex);
