@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/19 16:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/20 19:54:02 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/21 01:53:36 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,36 +71,29 @@ size_t getMaxBodySize(const HttpRequest &req, const Config *config)
     return (1048576);
 }
 
-static size_t extractContentLength(const HttpRequest &req)
-{
-    std::map<std::string, std::string>::const_iterator it;
-    size_t contentLength;
-    size_t i;
-
-    it = req.headers.find("Content-Length");
-    if (it == req.headers.end())
-        it = req.headers.find("content-length");
-    if (it != req.headers.end())
-    {
-        contentLength = 0;
-        i = 0;
-        while (i < it->second.length())
-        {
-            if (it->second[i] >= '0' && it->second[i] <= '9')
-                contentLength = contentLength * 10 + (it->second[i] - '0');
-            i++;
-        }
-        return (contentLength);
-    }
-    return (req.body.length());
-}
-
 int checkBodySizeLimit(const HttpRequest &req, const Config *config)
 {
+    std::map<std::string, std::string>::const_iterator headerIt;
     size_t contentLength;
     size_t maxSize;
+    size_t i;
 
-    contentLength = extractContentLength(req);
+    headerIt = req.headers.find("Content-Length");
+    if (headerIt == req.headers.end())
+        headerIt = req.headers.find("content-length");
+    contentLength = 0;
+    if (headerIt != req.headers.end())
+    {
+        i = 0;
+        while (i < headerIt->second.length())
+        {
+            if (headerIt->second[i] >= '0' && headerIt->second[i] <= '9')
+                contentLength = contentLength * 10 + (headerIt->second[i] - '0');
+            i++;
+        }
+    }
+    else
+        contentLength = req.body.length();
     if (contentLength == 0)
         return (1);
     maxSize = getMaxBodySize(req, config);

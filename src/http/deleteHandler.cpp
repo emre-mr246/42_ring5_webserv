@@ -6,28 +6,21 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 12:50:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/21 01:53:36 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http.hpp"
 #include "webserv.hpp"
-#include <sstream>
 #include <unistd.h>
 
 static HttpResponse createDeleteSuccessResponse(void)
 {
     HttpResponse response;
-    std::string body;
-    std::ostringstream oss;
 
-    response.statusCode = 200;
-    response.statusMessage = "OK";
-    body = "File deleted successfully";
-    response.body = body;
-    oss << body.length();
-    response.headers["Content-Length"] = oss.str();
-    response.headers["Content-Type"] = "text/plain";
+    response.statusCode = 204;
+    response.statusMessage = "No Content";
+    response.headers["Content-Length"] = "0";
     return (response);
 }
 

@@ -35,8 +35,8 @@ server {
 
 server {
     listen 0.0.0.0:8181;
-    server_name localhost hisarsec.com;
-    root /home/mr246/Documents/webserv/www;
+    server_name hisar hisarsec.com;
+    root /home/mr246/Documents/webserv/www/hisar;
     client_max_body_size 2097152;
     error_page 403 /errors/403.html;
     error_page 404 /errors/404.html;

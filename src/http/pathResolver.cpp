@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/05 13:39:50 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/20 19:54:02 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/21 01:53:36 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,19 @@ static int isPathSafe(const std::string &uri)
     return (1);
 }
 
+static std::string stripLocationPrefix(const std::string &uri, const std::string &locationPath)
+{
+    if (locationPath.empty() || locationPath == "/")
+        return (uri);
+    if (uri == locationPath)
+        return (std::string("/"));
+    if (uri.find(locationPath) != 0)
+        return (uri);
+    if (uri.length() == locationPath.length())
+        return (std::string("/"));
+    return (uri.substr(locationPath.length()));
+}
+
 static std::string buildPath(const std::string &uri, const std::string &root, const std::string &index)
 {
     std::string path;
@@ -57,15 +70,19 @@ std::string resolveFilePath(const std::string &uri, const HttpRequest &req, cons
     std::string root;
     std::string index;
     std::string cleanUri;
-    size_t qPos;
+    std::string relativeUri;
+    const LocationConfig *location;
 
-    qPos = uri.find('?');
-    if (qPos == std::string::npos)
-        cleanUri = uri;
-    else
-        cleanUri = uri.substr(0, qPos);
+    cleanUri = uri;
+    if (cleanUri.find('?') != std::string::npos)
+        cleanUri = cleanUri.substr(0, cleanUri.find('?'));
     if (!isPathSafe(cleanUri))
         return ("");
     getLocationSettings(req, config, root, index);
-    return (buildPath(cleanUri, root, index));
+    location = findLocation(req, config);
+    if (location)
+        relativeUri = stripLocationPrefix(cleanUri, location->path);
+    else
+        relativeUri = cleanUri;
+    return (buildPath(relativeUri, root, index));
 }
