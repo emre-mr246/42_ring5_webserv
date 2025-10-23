@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 12:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/21 01:53:36 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/24 02:32:13 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,14 +35,12 @@ const ServerConfig *findServerForRequest(const HttpRequest &req, const Config *c
 void resolveRoot(const LocationConfig *location, const ServerConfig *server,
                  std::string &root)
 {
-    if (!location->root.empty())
+    if (location && !location->root.empty())
         root = location->root;
-    else if (!location->uploadPath.empty())
-        root = location->uploadPath;
     else if (server && !server->root.empty())
         root = server->root;
     else
-        root = "./www";
+        root = "";
 }
 
 const LocationConfig *getDefaultLocation(const Config *config)
@@ -61,17 +59,12 @@ void getLocationSettings(const HttpRequest &req, const Config *config, std::stri
     const ServerConfig *server;
 
     location = findLocation(req, config);
-    if (location)
-    {
-        server = findServerForRequest(req, config);
-        resolveRoot(location, server, root);
+    server = findServerForRequest(req, config);
+    resolveRoot(location, server, root);
+    if (location && !location->indexFile.empty())
         index = location->indexFile;
-    }
     else
-    {
-        root = "./www";
-        index = "index.html";
-    }
+        index = "";
 }
 
 int isMethodAllowed(const HttpRequest &req, const Config *config)

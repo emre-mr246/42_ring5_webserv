@@ -24,7 +24,7 @@ server {
     location /upload
 	{
         accepted_methods POST DELETE;
-        upload_path /home/mr246/Documents/webserv/www/hogwarts/uploads;
+        root /home/mr246/Documents/webserv/www/hogwarts/uploads;
         client_max_body_size 204800;
     }
     location /restricted
@@ -45,5 +45,34 @@ server {
 	{
         index index.html;
         accepted_methods GET;
+    }
+}
+
+server {
+    listen 0.0.0.0:4242;
+	root /home/mr246/Documents/webserv/www/YoupiBanane;
+	server_name YoupiBanane youpibanane.com;
+	client_max_body_size 1048576;
+
+	location /
+	{
+        accepted_methods GET;
+		cgi_pass .bla /home/mr246/Documents/webserv/ubuntu_cgi_tester;
+    }
+	location /put_test
+	{
+		accepted_methods PUT;
+        root /home/mr246/Documents/webserv/www/hogwarYoupiBananets/uploads;
+        client_max_body_size 204800;
+    }
+	location /post_body
+	{
+		accepted_methods POST;
+    }
+	location /directory
+	{
+		root /home/mr246/Documents/webserv/www/YoupiBanane;
+		index index2.html;
+		accepted_methods GET;
     }
 }

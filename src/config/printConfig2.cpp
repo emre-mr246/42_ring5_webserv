@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 19:48:08 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/21 01:53:37 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/24 02:32:13 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,6 @@ void printSingleLocation(const LocationConfig &location)
         std::cout << "[CONFIG]   Root: " << location.root << std::endl;
     if (!location.indexFile.empty())
         std::cout << "[CONFIG]   Index: " << location.indexFile << std::endl;
-    if (!location.uploadPath.empty())
-        std::cout << "[CONFIG]   Upload path: " << location.uploadPath << std::endl;
     if (!location.cgiPass.empty())
         printCgiPasses(location.cgiPass);
 }

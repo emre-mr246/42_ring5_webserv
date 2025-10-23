@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/08 13:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/21 01:53:36 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/24 02:32:13 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,15 +109,16 @@ HttpResponse handlePostRequest(const HttpRequest &req, const Config *config)
     std::string filePath;
     std::string uploadPath;
     const LocationConfig *location;
+    const ServerConfig *server;
     int result;
 
     if (req.body.empty())
         return (createErrorResponse(400));
     location = findLocation(req, config);
-    if (location && !location->uploadPath.empty())
-        uploadPath = location->uploadPath;
-    else
-        uploadPath = "./uploads";
+    server = findServerForRequest(req, config);
+    resolveRoot(location, server, uploadPath);
+    if (uploadPath.empty())
+        return (createErrorResponse(500));
     fileName = extractUploadFileName(req);
     filePath = uploadPath + "/" + fileName;
     result = writeFile(filePath, req.body);

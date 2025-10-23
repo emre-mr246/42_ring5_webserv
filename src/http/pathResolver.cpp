@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/05 13:39:50 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/21 01:53:36 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/24 02:32:13 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,13 +52,27 @@ static std::string stripLocationPrefix(const std::string &uri, const std::string
 static std::string buildPath(const std::string &uri, const std::string &root, const std::string &index)
 {
     std::string path;
+    int rootEndsWithSlash;
 
+    rootEndsWithSlash = 0;
+    if (!root.empty() && root[root.length() - 1] == '/')
+        rootEndsWithSlash = 1;
     if (uri == "/")
     {
         if (!index.empty())
-            path = root + "/" + index;
+        {
+            if (rootEndsWithSlash)
+                path = root + index;
+            else
+                path = root + "/" + index;
+        }
         else
-            path = root + "/index.html";
+        {
+            if (rootEndsWithSlash)
+                path = root + "index.html";
+            else
+                path = root + "/index.html";
+        }
     }
     else
         path = root + uri;
