@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/08 13:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/24 02:32:13 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/24 03:37:40 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,8 +112,6 @@ HttpResponse handlePostRequest(const HttpRequest &req, const Config *config)
     const ServerConfig *server;
     int result;
 
-    if (req.body.empty())
-        return (createErrorResponse(400));
     location = findLocation(req, config);
     server = findServerForRequest(req, config);
     resolveRoot(location, server, uploadPath);

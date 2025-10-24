@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:12:19 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/24 02:32:14 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/24 03:37:40 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,10 +122,6 @@ int readFromClient(int clientFd, std::vector<struct pollfd> &pollFds, const Conf
         clientBuffer.append(buf, bytesRead);
         return (processNewData(clientFd, pollFds, config, wasHeadersParsed));
     }
-    if (bytesRead == 0)
-    {
-        clearClientBuffer(clientFd);
-        return (0);
-    }
-    return (1);
+    clearClientBuffer(clientFd);
+    return (0);
 }

@@ -57,6 +57,7 @@ server {
 	location /
 	{
         accepted_methods GET;
+		index index.html
 		cgi_pass .bla /home/mr246/Documents/webserv/ubuntu_cgi_tester;
     }
 	location /put_test
