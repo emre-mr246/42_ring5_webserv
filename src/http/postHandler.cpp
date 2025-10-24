@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/08 13:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/24 03:37:40 by emgul            ###   ########.fr       */
+/*   Updated: 2025/10/24 04:09:28 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,15 @@ HttpResponse handlePostRequest(const HttpRequest &req, const Config *config)
     const LocationConfig *location;
     const ServerConfig *server;
     int result;
+    HttpResponse response;
 
+    if (req.body.empty())
+    {
+        response.statusCode = 204;
+        response.statusMessage = "No Content";
+        response.headers["Content-Length"] = "0";
+        return (response);
+    }
     location = findLocation(req, config);
     server = findServerForRequest(req, config);
     resolveRoot(location, server, uploadPath);
