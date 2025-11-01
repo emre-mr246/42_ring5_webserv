@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:36 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/01 09:59:59 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 18:38:30 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ int processRequestData(const char *data, size_t len, HttpRequest &req);
 std::string buildHttpResponse(HttpResponse &res);
 std::string buildHttpResponseHeadersOnly(HttpResponse &res);
 void printHttpRequest(const HttpRequest &req);
+void printHttpResponse(const HttpResponse &res);
 std::string decodeChunkedBody(const std::string &body);
 int validateHttpRequest(const HttpRequest &req);
 std::string getErrorMessage(int code);
@@ -107,6 +108,8 @@ int hasPendingResponse(int clientFd);
 int sendPendingResponse(int clientFd);
 void clearPendingResponse(int clientFd);
 bool shouldCloseConnection(int clientFd);
+std::map<int, PendingResponse> &getPendingResponses(void);
+std::map<int, std::vector<ResponseQueueEntry> > &getResponseQueues(void);
 HttpResponse executeCgiScript(const std::string &scriptPath, const std::string &interpreter, const HttpRequest &req, const Config *config);
 std::string getCgiInterpreter(const std::string &uri, const HttpRequest &req, const Config *config);
 std::string extractQueryString(const std::string &uri);

@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 19:48:08 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/01 09:59:59 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 18:38:30 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,20 +17,17 @@ void printAcceptedMethods(const std::vector<std::string> &acceptedMethods)
     std::vector<std::string>::const_iterator it;
 
     if (acceptedMethods.empty())
-    {
-        std::cout << "[CONFIG]   Accepted methods: (none specified)" << std::endl;
         return;
-    }
-    std::cout << "[CONFIG]   Accepted methods: ";
+    std::cout << "        allow ";
     it = acceptedMethods.begin();
     while (it != acceptedMethods.end())
     {
         std::cout << *it;
         it++;
         if (it != acceptedMethods.end())
-            std::cout << ", ";
+            std::cout << " ";
     }
-    std::cout << std::endl;
+    std::cout << ";" << std::endl;
 }
 
 void printCgiPasses(const std::map<std::string, std::string> &cgiPass)
@@ -40,22 +37,21 @@ void printCgiPasses(const std::map<std::string, std::string> &cgiPass)
     it = cgiPass.begin();
     while (it != cgiPass.end())
     {
-        std::cout << "[CONFIG]   CGI pass: " << it->first << " -> "
-                  << it->second << std::endl;
+        std::cout << "        cgi_pass " << it->first << " " << it->second << ";" << std::endl;
         it++;
     }
 }
 
 void printSingleLocation(const LocationConfig &location)
 {
-    std::cout << "[CONFIG] Location path: " << location.path << std::endl;
-    std::cout << "[CONFIG]   Client max body size: "
-              << (location.clientMaxBodySize + 1023) / 1024 << " KB" << std::endl;
+    std::cout << "    location " << location.path << " {" << std::endl;
+    std::cout << "        client_max_body_size " << (location.clientMaxBodySize + 1023) / 1024 << "K;" << std::endl;
     printAcceptedMethods(location.acceptedMethods);
     if (!location.root.empty())
-        std::cout << "[CONFIG]   Root: " << location.root << std::endl;
+        std::cout << "        root " << location.root << ";" << std::endl;
     if (!location.indexFile.empty())
-        std::cout << "[CONFIG]   Index: " << location.indexFile << std::endl;
+        std::cout << "        index " << location.indexFile << ";" << std::endl;
     if (!location.cgiPass.empty())
         printCgiPasses(location.cgiPass);
+    std::cout << "    }" << std::endl;
 }

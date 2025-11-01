@@ -6,39 +6,32 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:35 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/01 09:59:58 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 18:38:29 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http.hpp"
 #include "webserv.hpp"
 
-static void displayRequestLine(const HttpRequest &req)
-{
-    std::cout << "Method: " << req.method << std::endl;
-    std::cout << "URI: " << req.uri << std::endl;
-    std::cout << "Version: " << req.version << std::endl;
-}
-
-static void displayHeaders(const HttpRequest &req)
-{
-    std::map<std::string, std::string>::const_iterator it;
-
-    std::cout << "Headers:" << std::endl;
-    it = req.headers.begin();
-    while (it != req.headers.end())
-    {
-        std::cout << "  " << it->first << ": " << it->second << std::endl;
-        it++;
-    }
-}
-
 void printHttpRequest(const HttpRequest &req)
 {
-    std::cout << "=== HTTP Request ===" << std::endl;
-    displayRequestLine(req);
-    displayHeaders(req);
-    if (!req.body.empty())
-        std::cout << "Body: " << req.body << std::endl;
-    std::cout << "===================" << std::endl;
+    if (DEBUG_REQUESTS)
+    {
+        std::cout << "[REQUEST] === HTTP Request ===" << std::endl;
+        std::cout << "[REQUEST] Method: " << req.method << std::endl;
+        std::cout << "[REQUEST] URI: " << req.uri << std::endl;
+        std::cout << "[REQUEST] Version: " << req.version << std::endl;
+        std::cout << "[REQUEST] Headers:" << std::endl;
+        std::map<std::string, std::string>::const_iterator it;
+        it = req.headers.begin();
+        while (it != req.headers.end())
+        {
+            std::cout << "[REQUEST]   " << it->first << ": " << it->second << std::endl;
+            it++;
+        }
+        if (!req.body.empty())
+            std::cout << "[REQUEST] Body: " << req.body << std::endl;
+        std::cout << "[REQUEST] ===================" << std::endl;
+        std::cout.flush();
+    }
 }

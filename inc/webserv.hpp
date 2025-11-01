@@ -6,11 +6,15 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 10:51:54 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/01 09:59:59 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 18:38:30 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
+
+#define DEBUG_MODE 0
+#define DEBUG_REQUESTS 0
+#define DEBUG_RESPONSES 0
 
 struct HttpRequest;
 struct HttpResponse;
@@ -120,3 +124,4 @@ void removeClientTime(int clientFd);
 void checkClientTimeouts(std::vector<struct pollfd> &pollFds);
 void trackCgiProcess(pid_t pid);
 int checkCgiTimeout(pid_t pid);
+std::map<int, ClientRequestBuffer> &getClientBuffers(void);

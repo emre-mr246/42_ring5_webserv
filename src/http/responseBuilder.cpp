@@ -6,11 +6,12 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:35 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/01 09:59:58 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 18:38:29 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http.hpp"
+#include "webserv.hpp"
 #include <ctime>
 #include <sstream>
 

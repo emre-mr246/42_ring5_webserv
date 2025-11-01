@@ -6,13 +6,16 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 03:47:21 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/01 09:59:59 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 18:38:30 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-void initializeSignals(void) { signal(SIGPIPE, SIG_IGN); }
+void initializeSignals(void)
+{
+    signal(SIGPIPE, SIG_IGN);
+}
 
 std::string getConfigPath(int argc, char **argv)
 {
@@ -50,11 +53,15 @@ int main(int argc, char **argv)
     std::string configPath;
 
     initializeSignals();
+    if (DEBUG_MODE)
+        std::cout << "[INFO] Starting webserv..." << std::endl;
     configPath = getConfigPath(argc, argv);
     if (configPath.empty())
         return (1);
     if (!serverConfig.loadConfig(configPath))
         return (1);
+    if (DEBUG_MODE)
+        printConfig(serverConfig);
     gatherAddresses(serverConfig, addresses);
     if (!openServerSockets(addresses, serverFds))
         return (1);

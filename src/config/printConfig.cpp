@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 14:49:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/01 09:59:59 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 18:38:30 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,14 +17,12 @@ printListenAddresses(const std::vector<std::pair<std::string, int> > &listenOn)
 {
     std::vector<std::pair<std::string, int> >::const_iterator it;
 
-    std::cout << "[CONFIG] Server listening on: ";
     it = listenOn.begin();
     while (it != listenOn.end())
     {
-        std::cout << it->first << ":" << it->second << " ";
+        std::cout << "    listen " << it->first << ":" << it->second << ";" << std::endl;
         it++;
     }
-    std::cout << std::endl;
 }
 
 static void printServerNames(const std::vector<std::string> &serverNames)
@@ -33,16 +31,12 @@ static void printServerNames(const std::vector<std::string> &serverNames)
 
     if (serverNames.empty())
         return;
-    std::cout << "[CONFIG] Server names: ";
     it = serverNames.begin();
     while (it != serverNames.end())
     {
-        std::cout << *it;
+        std::cout << "    server_name " << *it << ";" << std::endl;
         it++;
-        if (it != serverNames.end())
-            std::cout << ", ";
     }
-    std::cout << std::endl;
 }
 
 static void printErrorPages(const std::map<int, std::string> &errorPages)
@@ -52,8 +46,7 @@ static void printErrorPages(const std::map<int, std::string> &errorPages)
     it = errorPages.begin();
     while (it != errorPages.end())
     {
-        std::cout << "[CONFIG] Error page " << it->first << ": " << it->second
-                  << std::endl;
+        std::cout << "    error_page " << it->first << " " << it->second << ";" << std::endl;
         it++;
     }
 }
@@ -74,22 +67,23 @@ void printConfig(const Config &serverConfig)
 {
     std::vector<ServerConfig>::const_iterator it;
 
+    std::cout << std::endl;
+    std::cout << "# Configuration loaded" << std::endl;
+    std::cout << "# =====================" << std::endl;
     it = serverConfig.getServerConfigs().begin();
     while (it != serverConfig.getServerConfigs().end())
     {
-        std::cout << "[Server "
-                  << (it - serverConfig.getServerConfigs().begin() + 1)
-                  << "] ------------------------------" << std::endl;
+        std::cout << std::endl
+                  << "server {" << std::endl;
         printListenAddresses(it->listenOn);
         printServerNames(it->serverNames);
         if (!it->root.empty())
-            std::cout << "[CONFIG] Server root: " << it->root << std::endl;
-        std::cout << "[CONFIG] Client max body size: "
-                  << (it->clientMaxBodySize + 1023) / 1024 << " KB" << std::endl;
+            std::cout << "    root " << it->root << ";" << std::endl;
+        std::cout << "    client_max_body_size " << (it->clientMaxBodySize + 1023) / 1024 << "K;" << std::endl;
         printErrorPages(it->errorPages);
         printLocations(it->locations);
+        std::cout << "}" << std::endl;
         it++;
-        if (it != serverConfig.getServerConfigs().end())
-            std::cout << std::endl;
     }
+    std::cout << std::endl;
 }

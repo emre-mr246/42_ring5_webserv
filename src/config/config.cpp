@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 21:07:50 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/01 09:59:59 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 18:38:30 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,8 @@ int readConfigFile(const std::string &filePath,
                   << std::endl;
         return (0);
     }
-    std::cout << "[INFO] Reading configuration file..." << std::endl;
+    if (DEBUG_MODE)
+        std::cout << "[INFO] Reading configuration file..." << std::endl;
     parserConfig(configFile, serverConfigs);
     configFile.close();
     return (1);

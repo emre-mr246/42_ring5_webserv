@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 08:12:21 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/01 09:59:58 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 18:38:29 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ void handleRequest(const HttpRequest &req, int clientFd,
     bool shouldClose;
 
     response = routeRequest(req, config);
+    printHttpResponse(response);
     shouldClose = shouldCloseAfterResponse(req);
     if (shouldClose)
         response.headers["Connection"] = "close";

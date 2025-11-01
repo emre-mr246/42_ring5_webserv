@@ -6,15 +6,12 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 19:48:08 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/01 09:59:58 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 18:38:30 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http.hpp"
 #include "webserv.hpp"
-
-std::map<int, PendingResponse> &getPendingResponses(void);
-std::map<int, std::vector<ResponseQueueEntry> > &getResponseQueues(void);
 
 void setPendingResponse(int clientFd, const std::string &response, bool shouldClose)
 {

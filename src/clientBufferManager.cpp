@@ -6,14 +6,12 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/19 00:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/01 09:59:58 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 18:38:29 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 #include <map>
-
-std::map<int, ClientRequestBuffer> &getClientBuffers(void);
 
 std::string &getClientBuffer(int clientFd)
 {
