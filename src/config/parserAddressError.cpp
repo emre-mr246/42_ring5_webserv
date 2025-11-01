@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 22:14:28 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 09:59:59 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,7 @@ static void parseCodesHelper(const std::string &codes, std::map<int, std::string
     size_t end;
 
     start = 0;
-    end = 0;
-    while (end != std::string::npos)
+    while (start < codes.length())
     {
         end = codes.find(' ', start);
         if (end == std::string::npos)
@@ -62,6 +61,8 @@ static void parseCodesHelper(const std::string &codes, std::map<int, std::string
             if (code > 0)
                 errorPages[code] = path;
         }
+        if (end == std::string::npos)
+            break;
         start = end + 1;
     }
 }

@@ -5,18 +5,13 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/17 12:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/20 19:54:02 by emgul            ###   ########.fr       */
+/*   Created: 2025/11/01 08:12:21 by emgul            #+#    #+#              */
+/*   Updated: 2025/11/01 09:59:58 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http.hpp"
 #include "webserv.hpp"
-
-const LocationConfig *getLocationConfig(const HttpRequest &req, const Config *config)
-{
-    return (findLocation(req, config));
-}
 
 const ServerConfig *findServerForRequest(const HttpRequest &req, const Config *config)
 {
@@ -29,18 +24,20 @@ const ServerConfig *findServerForRequest(const HttpRequest &req, const Config *c
     server = findServerByHost(config, host, port);
     if (!server)
         server = findServerByPort(config, port);
+    if (!server)
+        server = findFirstServer(config);
     return (server);
 }
 
 void resolveRoot(const LocationConfig *location, const ServerConfig *server,
                  std::string &root)
 {
-    if (location->root.empty() && server && !server->root.empty())
-        root = server->root;
-    else if (!location->root.empty())
+    if (location && !location->root.empty())
         root = location->root;
+    else if (server && !server->root.empty())
+        root = server->root;
     else
-        root = "./www";
+        root = "";
 }
 
 const LocationConfig *getDefaultLocation(const Config *config)
@@ -59,33 +56,30 @@ void getLocationSettings(const HttpRequest &req, const Config *config, std::stri
     const ServerConfig *server;
 
     location = findLocation(req, config);
-    if (location)
-    {
-        server = findServerForRequest(req, config);
-        resolveRoot(location, server, root);
+    server = findServerForRequest(req, config);
+    resolveRoot(location, server, root);
+    if (location && !location->indexFile.empty())
         index = location->indexFile;
-    }
     else
-    {
-        root = "./www";
-        index = "index.html";
-    }
+        index = "";
 }
 
 int isMethodAllowed(const HttpRequest &req, const Config *config)
 {
     const LocationConfig *location;
     size_t i;
+    std::string methodName;
 
     location = findLocation(req, config);
     if (!location)
         return (1);
     if (location->acceptedMethods.empty())
         return (1);
+    methodName = req.method;
     i = 0;
     while (i < location->acceptedMethods.size())
     {
-        if (location->acceptedMethods[i] == req.method)
+        if (location->acceptedMethods[i] == methodName)
             return (1);
         i++;
     }

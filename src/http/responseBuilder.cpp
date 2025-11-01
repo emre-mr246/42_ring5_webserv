@@ -6,24 +6,49 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:35 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/20 19:54:02 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 09:59:58 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http.hpp"
+#include <ctime>
 #include <sstream>
+
+static std::string getCurrentDate()
+{
+    time_t now;
+    struct tm *gmtTime;
+    char buffer[100];
+
+    now = time(NULL);
+    gmtTime = gmtime(&now);
+    strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", gmtTime);
+    return (std::string(buffer));
+}
 
 static std::string getStatusMessage(int code)
 {
-    if (code == 200)
+    switch (code)
+    {
+    case 200:
         return ("OK");
-    if (code == 404)
-        return ("Not Found");
-    if (code == 500)
-        return ("Internal Server Error");
-    if (code == 403)
+    case 400:
+        return ("Bad Request");
+    case 403:
         return ("Forbidden");
-    return ("Unknown");
+    case 404:
+        return ("Not Found");
+    case 405:
+        return ("Method Not Allowed");
+    case 413:
+        return ("Payload Too Large");
+    case 500:
+        return ("Internal Server Error");
+    case 504:
+        return ("Gateway Timeout");
+    default:
+        return ("Unknown");
+    }
 }
 
 static std::string buildStatusLine(const HttpResponse &res)
@@ -56,8 +81,27 @@ std::string buildHttpResponse(HttpResponse &res)
 
     if (res.statusMessage.empty())
         res.statusMessage = getStatusMessage(res.statusCode);
+    if (res.headers.find("Connection") == res.headers.end())
+        res.headers["Connection"] = "keep-alive";
+    if (res.headers.find("Date") == res.headers.end())
+        res.headers["Date"] = getCurrentDate();
     oss << buildStatusLine(res);
     oss << buildHeaders(res);
     oss << res.body;
+    return (oss.str());
+}
+
+std::string buildHttpResponseHeadersOnly(HttpResponse &res)
+{
+    std::ostringstream oss;
+
+    if (res.statusMessage.empty())
+        res.statusMessage = getStatusMessage(res.statusCode);
+    if (res.headers.find("Connection") == res.headers.end())
+        res.headers["Connection"] = "keep-alive";
+    if (res.headers.find("Date") == res.headers.end())
+        res.headers["Date"] = getCurrentDate();
+    oss << buildStatusLine(res);
+    oss << buildHeaders(res);
     return (oss.str());
 }

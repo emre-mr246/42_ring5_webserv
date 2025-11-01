@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/19 14:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
+/*   Created: 2025/11/01 08:12:21 by emgul            #+#    #+#              */
+/*   Updated: 2025/11/01 09:59:58 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ static HttpResponse buildSimpleResponse(const std::string &output)
     response.statusCode = 200;
     response.statusMessage = "OK";
     response.body = output;
-    response.headers["Content-Type"] = "text/html";
+    response.headers["Content-Type"] = "application/octet-stream";
     oss << output.length();
     response.headers["Content-Length"] = oss.str();
     return (response);
@@ -32,11 +32,8 @@ static void addContentLengthIfMissing(HttpResponse &response)
 {
     std::ostringstream oss;
 
-    if (response.headers.find("Content-Length") == response.headers.end())
-    {
-        oss << response.body.length();
-        response.headers["Content-Length"] = oss.str();
-    }
+    oss << response.body.length();
+    response.headers["Content-Length"] = oss.str();
 }
 
 HttpResponse parseCgiOutput(const std::string &output)
@@ -44,14 +41,26 @@ HttpResponse parseCgiOutput(const std::string &output)
     HttpResponse response;
     size_t headerEnd;
     std::string headers;
+    size_t headerEndPos;
 
+    headerEndPos = output.find("\r\n\r\n");
     headerEnd = output.find("\n\n");
-    if (headerEnd == std::string::npos)
+    if (headerEndPos != std::string::npos && (headerEnd == std::string::npos || headerEndPos < headerEnd))
+    {
+        response.statusCode = 200;
+        response.statusMessage = "OK";
+        headers = output.substr(0, headerEndPos);
+        response.body = output.substr(headerEndPos + 4);
+    }
+    else if (headerEnd != std::string::npos)
+    {
+        response.statusCode = 200;
+        response.statusMessage = "OK";
+        headers = output.substr(0, headerEnd);
+        response.body = output.substr(headerEnd + 2);
+    }
+    else
         return (buildSimpleResponse(output));
-    response.statusCode = 200;
-    response.statusMessage = "OK";
-    headers = output.substr(0, headerEnd);
-    response.body = output.substr(headerEnd + 2);
     parseHeadersFromCgi(headers, response);
     processStatusHeaderFromCgi(response);
     addContentLengthIfMissing(response);

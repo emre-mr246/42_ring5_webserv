@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:35 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/20 19:54:02 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 09:59:58 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,17 +50,50 @@ HttpResponse buildCustomError(int code, const std::string &content)
     return (response);
 }
 
+static std::string getAllowedMethods(const HttpRequest &req, const Config *config)
+{
+    const LocationConfig *location;
+    std::ostringstream oss;
+    size_t i;
+
+    location = findLocation(req, config);
+    if (!location || location->acceptedMethods.empty())
+        return ("");
+    i = 0;
+    while (i < location->acceptedMethods.size())
+    {
+        if (i > 0)
+            oss << ", ";
+        oss << location->acceptedMethods[i];
+        i++;
+    }
+    return (oss.str());
+}
+
 HttpResponse createErrorResponse(int statusCode, const HttpRequest &req,
                                  const Config *config)
 {
     std::string content;
+    HttpResponse response;
+    std::string allowHeader;
     int result;
 
     result = tryLocationErrorPage(statusCode, req, config, content);
     if (result == 1)
-        return (buildCustomError(statusCode, content));
-    result = tryServerErrorPage(statusCode, req, config, content);
-    if (result == 1)
-        return (buildCustomError(statusCode, content));
-    return (createErrorResponse(statusCode));
+        response = buildCustomError(statusCode, content);
+    else
+    {
+        result = tryServerErrorPage(statusCode, req, config, content);
+        if (result == 1)
+            response = buildCustomError(statusCode, content);
+        else
+            response = createErrorResponse(statusCode);
+    }
+    if (statusCode == 405)
+    {
+        allowHeader = getAllowedMethods(req, config);
+        if (!allowHeader.empty())
+            response.headers["Allow"] = allowHeader;
+    }
+    return (response);
 }

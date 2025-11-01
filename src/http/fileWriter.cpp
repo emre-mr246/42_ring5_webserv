@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/08 13:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 09:59:58 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,14 +16,19 @@
 static int writeFileContent(int fd, const std::string &content)
 {
     size_t totalWritten;
-    size_t bytesToWrite;
+    size_t remaining;
+    size_t chunkSize;
     ssize_t bytesWritten;
 
     totalWritten = 0;
     while (totalWritten < content.length())
     {
-        bytesToWrite = content.length() - totalWritten;
-        bytesWritten = write(fd, content.c_str() + totalWritten, bytesToWrite);
+        remaining = content.length() - totalWritten;
+        if (remaining > CGI_CHUNK_SIZE)
+            chunkSize = CGI_CHUNK_SIZE;
+        else
+            chunkSize = remaining;
+        bytesWritten = write(fd, content.c_str() + totalWritten, chunkSize);
         if (bytesWritten <= 0)
             return (0);
         totalWritten = totalWritten + bytesWritten;

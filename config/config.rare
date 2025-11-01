@@ -24,7 +24,7 @@ server {
     location /upload
 	{
         accepted_methods POST DELETE;
-        upload_path /home/mr246/Documents/webserv/www/hogwarts/uploads;
+        root /home/mr246/Documents/webserv/www/hogwarts/uploads;
         client_max_body_size 204800;
     }
     location /restricted
@@ -35,8 +35,8 @@ server {
 
 server {
     listen 0.0.0.0:8181;
-    server_name localhost hisarsec.com;
-    root /home/mr246/Documents/webserv/www;
+    server_name hisar hisarsec.com;
+    root /home/mr246/Documents/webserv/www/hisar;
     client_max_body_size 2097152;
     error_page 403 /errors/403.html;
     error_page 404 /errors/404.html;
@@ -45,5 +45,31 @@ server {
 	{
         index index.html;
         accepted_methods GET;
+    }
+}
+
+server {
+    listen 0.0.0.0:4242;
+	root /home/mr246/Documents/webserv/www/YoupiBanane;
+	server_name YoupiBanane youpibanane.com;
+	client_max_body_size 1048576;
+
+	location /
+	{
+		accepted_methods GET;
+		index index.html;
+    }
+	location /post_body
+	{
+        client_max_body_size 100;
+		accepted_methods POST;
+    }
+	location /directory
+	{
+		root /home/mr246/Documents/webserv/www/YoupiBanane;
+		index youpi.bad_extension;
+		accepted_methods GET POST;
+		client_max_body_size 104857600;
+		cgi_pass .bla /home/mr246/Documents/webserv/ubuntu_cgi_tester;
     }
 }

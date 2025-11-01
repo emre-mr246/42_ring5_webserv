@@ -6,17 +6,17 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:15:47 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 09:59:58 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-static int createSocket()
+static int createSocket(int family)
 {
     int fd;
 
-    fd = socket(AF_INET, SOCK_STREAM, 0);
+    fd = socket(family, SOCK_STREAM, 0);
     if (fd == -1)
         printError("socket(SOCK_STREAM)");
     return (fd);
@@ -56,21 +56,17 @@ int setNonblocking(int fd)
 int createListeningSocket(const std::string &host, int port)
 {
     int fd;
+    int family;
 
-    fd = createSocket();
+    family = AF_INET;
+    fd = createSocket(family);
     if (fd == -1)
         return (-1);
     if (setReuseaddr(fd) == -1 || setNonblocking(fd) == -1 ||
-        bindServerSocket(fd, host, port, BACKLOG) == -1)
+        bindServerSocket(fd, host, port, BACKLOG, family) == -1)
     {
         close(fd);
         return (-1);
     }
-    std::cout << "Server listening on ";
-    if (host.empty())
-        std::cout << "0.0.0.0";
-    else
-        std::cout << host;
-    std::cout << ":" << port << " (fd: " << fd << ")" << std::endl;
     return (fd);
 }

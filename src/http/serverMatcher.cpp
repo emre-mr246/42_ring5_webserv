@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/17 12:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
+/*   Created: 2025/11/01 08:12:21 by emgul            #+#    #+#              */
+/*   Updated: 2025/11/01 09:59:58 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,4 +68,12 @@ const ServerConfig *findServerByHost(const Config *config,
         serverIt++;
     }
     return (NULL);
+}
+
+const ServerConfig *findFirstServer(const Config *config)
+{
+    const std::vector<ServerConfig> &servers = config->getServerConfigs();
+    if (servers.empty())
+        return (NULL);
+    return (&servers[0]);
 }

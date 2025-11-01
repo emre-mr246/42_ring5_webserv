@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/15 12:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
+/*   Created: 2025/11/01 08:12:21 by emgul            #+#    #+#              */
+/*   Updated: 2025/11/01 09:59:58 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,12 @@
 #include "webserv.hpp"
 #include <sstream>
 
-static void parseHeader(const std::string &line, HttpResponse &response)
+static void parseCgiResponseHeader(const std::string &line, HttpResponse &response)
 {
     size_t colonPos;
     std::string key;
     std::string value;
+    size_t endPos;
 
     colonPos = line.find(':');
     if (colonPos == std::string::npos)
@@ -27,7 +28,10 @@ static void parseHeader(const std::string &line, HttpResponse &response)
     value = line.substr(colonPos + 1);
     while (!value.empty() && (value[0] == ' ' || value[0] == '\t'))
         value = value.substr(1);
-    response.headers[key] = value;
+    endPos = value.length();
+    while (endPos > 0 && (value[endPos - 1] == '\r' || value[endPos - 1] == '\n' || value[endPos - 1] == ' '))
+        endPos--;
+    response.headers[key] = value.substr(0, endPos);
 }
 
 static int extractStatusCode(const std::string &statusValue)
@@ -73,7 +77,7 @@ void parseHeadersFromCgi(const std::string &headers, HttpResponse &response)
         if (pos == std::string::npos)
             pos = headers.length();
         if (pos > start)
-            parseHeader(headers.substr(start, pos - start), response);
+            parseCgiResponseHeader(headers.substr(start, pos - start), response);
         start = pos + 1;
     }
 }

@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/08 13:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/20 19:54:02 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 09:59:58 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,18 @@ static std::string parseDispositionFilename(const std::string &disposition)
     return (disposition.substr(start, end - start));
 }
 
+static std::string getXFileNameHeader(const HttpRequest &req)
+{
+    std::map<std::string, std::string>::const_iterator it;
+
+    it = req.headers.find("X-File-Name");
+    if (it == req.headers.end())
+        it = req.headers.find("x-file-name");
+    if (it != req.headers.end() && !it->second.empty())
+        return (it->second);
+    return ("");
+}
+
 static std::string extractUploadFileName(const HttpRequest &req)
 {
     std::map<std::string, std::string>::const_iterator it;
@@ -70,18 +82,9 @@ static std::string extractUploadFileName(const HttpRequest &req)
     if (it == req.headers.end())
         it = req.headers.find("content-disposition");
     if (it != req.headers.end())
-    {
-        disposition = it->second;
-        headerName = parseDispositionFilename(disposition);
-    }
+        headerName = parseDispositionFilename(it->second);
     if (headerName.empty())
-    {
-        it = req.headers.find("X-File-Name");
-        if (it == req.headers.end())
-            it = req.headers.find("x-file-name");
-        if (it != req.headers.end() && !it->second.empty())
-            headerName = it->second;
-    }
+        headerName = getXFileNameHeader(req);
     if (headerName.empty())
         return ("uploadedFile");
     return (sanitizeFileName(headerName));
@@ -103,25 +106,59 @@ static HttpResponse createPostSuccessResponse(void)
     return (response);
 }
 
-HttpResponse handlePostRequest(const HttpRequest &req, const Config *config)
+static int handlePostCgi(const std::string &filePath, const HttpRequest &req,
+                         const Config *config, HttpResponse &response)
 {
+    std::string interpreter;
+
+    interpreter = getCgiInterpreter(filePath, req, config);
+    if (!interpreter.empty())
+    {
+        response = executeCgiScript(filePath, interpreter, req, config);
+        if (response.statusCode >= 400)
+        {
+            response = createErrorResponse(response.statusCode);
+            return (1);
+        }
+        return (1);
+    }
+    return (0);
+}
+
+static HttpResponse handlePostFileUpload(const HttpRequest &req, const Config *config)
+{
+    std::string uploadPath;
     std::string fileName;
     std::string filePath;
-    std::string uploadPath;
     const LocationConfig *location;
+    const ServerConfig *server;
     int result;
 
-    if (req.body.empty())
-        return (createErrorResponse(400));
     location = findLocation(req, config);
-    if (location && !location->uploadPath.empty())
-        uploadPath = location->uploadPath;
-    else
-        uploadPath = "./uploads";
+    server = findServerForRequest(req, config);
+    resolveRoot(location, server, uploadPath);
+    if (uploadPath.empty())
+        return (createErrorResponse(500));
     fileName = extractUploadFileName(req);
     filePath = uploadPath + "/" + fileName;
     result = writeFile(filePath, req.body);
     if (!result)
         return (createErrorResponse(500));
     return (createPostSuccessResponse());
+}
+
+HttpResponse handlePostRequest(const HttpRequest &req, const Config *config)
+{
+    std::string filePath;
+    HttpResponse response;
+    int isCgi;
+
+    filePath = resolveFilePath(req.uri, req, config);
+    if (!filePath.empty())
+    {
+        isCgi = handlePostCgi(filePath, req, config, response);
+        if (isCgi)
+            return (response);
+    }
+    return (handlePostFileUpload(req, config));
 }

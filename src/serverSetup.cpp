@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 20:20:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 09:59:59 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,17 +48,35 @@ void gatherAddresses(const Config &config, std::vector<std::pair<std::string, in
         addUniqueAddress(addresses, "0.0.0.0", 8080);
 }
 
+static std::map<int, int> &getServerFdToPortMap(void)
+{
+    static std::map<int, int> serverFdToPort;
+    return (serverFdToPort);
+}
+
+int getPortFromServerFd(int serverFd)
+{
+    std::map<int, int>::iterator it = getServerFdToPortMap().find(serverFd);
+    if (it != getServerFdToPortMap().end())
+        return (it->second);
+    return (-1);
+}
+
 int openServerSockets(const std::vector<std::pair<std::string, int> > &addresses, std::vector<int> &fds)
 {
     size_t i;
     int fd;
+    std::map<int, int> &fdToPortMap = getServerFdToPortMap();
 
     i = 0;
     while (i < addresses.size())
     {
         fd = createListeningSocket(addresses[i].first, addresses[i].second);
         if (fd != -1)
+        {
             fds.push_back(fd);
+            fdToPortMap[fd] = addresses[i].second;
+        }
         i++;
     }
     if (fds.empty())

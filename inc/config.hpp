@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 21:32:43 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 09:59:59 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ struct LocationConfig
     std::string root;
     std::string indexFile;
     std::vector<std::string> acceptedMethods;
-    std::string uploadPath;
     size_t clientMaxBodySize;
     std::map<std::string, std::string> cgiPass;
     std::map<int, std::string> errorPages;
@@ -88,7 +87,6 @@ std::string extractLocationPath(const std::string &line);
 std::vector<std::string> extractAcceptedMethods(const std::string &line);
 std::string extractRoot(const std::string &line);
 std::string extractIndex(const std::string &line);
-std::string extractUploadPath(const std::string &line);
 void addCgiPass(const std::string &line, LocationConfig &location);
 std::vector<std::string> extractServerNames(const std::string &line);
 int validateServerConfig(const ServerConfig &server);

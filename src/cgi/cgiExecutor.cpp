@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/14 16:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
+/*   Created: 2025/11/01 08:12:21 by emgul            #+#    #+#              */
+/*   Updated: 2025/11/01 09:59:58 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,16 @@ HttpResponse executeCgiScript(const std::string &scriptPath,
                               const std::string &interpreter,
                               const HttpRequest &req, const Config *config)
 {
-    int pipefd[2];
+    int inputPipe[2];
+    int outputPipe[2];
 
-    if (pipe(pipefd) == -1)
+    if (pipe(inputPipe) == -1)
         return (createErrorResponse(500, req, config));
-    return (runCgiProcess(pipefd, scriptPath, interpreter, req, config));
+    if (pipe(outputPipe) == -1)
+    {
+        close(inputPipe[0]);
+        close(inputPipe[1]);
+        return (createErrorResponse(500, req, config));
+    }
+    return (runCgiProcess(inputPipe, outputPipe, scriptPath, interpreter, req, config));
 }

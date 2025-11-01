@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 14:49:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 09:59:59 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,24 +39,13 @@ std::vector<std::string> extractAcceptedMethods(const std::string &line)
     value = strtrim(line.substr(pos + 16));
     if (!value.empty() && value[value.length() - 1] == ';')
         value = value.substr(0, value.length() - 1);
+    value = strtrim(value);
+    if (value.empty())
+        return (methods);
     start = 0;
     while (start < value.length())
         addMethodToList(value, start, methods);
     return (methods);
-}
-
-std::string extractUploadPath(const std::string &line)
-{
-    std::string value;
-    size_t pos;
-
-    pos = line.find("upload_path");
-    if (pos == std::string::npos)
-        return ("");
-    value = strtrim(line.substr(pos + 11));
-    if (!value.empty() && value[value.length() - 1] == ';')
-        value.resize(value.length() - 1);
-    return (strtrim(value));
 }
 
 void addCgiPass(const std::string &line, LocationConfig &location)

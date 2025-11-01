@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 19:48:35 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 09:59:57 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,9 @@ long strtol(const char *ptr, char **endptr)
     }
     if (endptr)
         *endptr = const_cast<char *>(str);
-    return (sign ? -result : result);
+    if (sign)
+        return (-result);
+    return (result);
 }
 
 void *memset(void *str, int c, size_t n)

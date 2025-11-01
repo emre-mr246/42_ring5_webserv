@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 19:48:09 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 09:59:58 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ int handleClientData(std::vector<struct pollfd> &pollFds, size_t i, const Config
     int clientFd;
 
     clientFd = pollFds[i].fd;
+    if (hasPendingResponse(clientFd) && shouldCloseConnection(clientFd))
+        return (1);
     if (!readFromClient(clientFd, pollFds, config))
     {
         close(clientFd);
@@ -32,6 +34,7 @@ int handleClientWrite(std::vector<struct pollfd> &pollFds, size_t i)
 {
     int clientFd;
     int status;
+    bool shouldClose;
 
     clientFd = pollFds[i].fd;
     if (!hasPendingResponse(clientFd))
@@ -39,6 +42,8 @@ int handleClientWrite(std::vector<struct pollfd> &pollFds, size_t i)
         updateClientEvents(pollFds, clientFd, POLLIN);
         return (1);
     }
+    updateClientTime(clientFd);
+    shouldClose = shouldCloseConnection(clientFd);
     status = sendPendingResponse(clientFd);
     if (status == 0)
     {
@@ -48,7 +53,16 @@ int handleClientWrite(std::vector<struct pollfd> &pollFds, size_t i)
         return (0);
     }
     if (status == 2)
+    {
+        if (shouldClose)
+        {
+            close(clientFd);
+            clearPendingResponse(clientFd);
+            removeClientFromPoll(pollFds, i);
+            return (0);
+        }
         updateClientEvents(pollFds, clientFd, POLLIN);
+    }
     return (1);
 }
 
@@ -59,46 +73,10 @@ void sendErrorAndStop(int clientFd, std::vector<struct pollfd> &pollFds,
     std::string responseStr;
 
     response = createErrorResponse(statusCode);
+    response.headers["Connection"] = "close";
     responseStr = buildHttpResponse(response);
-    setPendingResponse(clientFd, responseStr);
+    setPendingResponse(clientFd, responseStr, true);
     updateClientEvents(pollFds, clientFd, POLLIN | POLLOUT);
     clearClientBuffer(clientFd);
     *shouldContinue = 0;
-}
-
-static int handleBufferOverflow(int clientFd, std::vector<struct pollfd> &pollFds)
-{
-    HttpResponse response;
-    std::string responseStr;
-
-    response = createErrorResponse(413);
-    responseStr = buildHttpResponse(response);
-    setPendingResponse(clientFd, responseStr);
-    updateClientEvents(pollFds, clientFd, POLLIN | POLLOUT);
-    clearClientBuffer(clientFd);
-    return (1);
-}
-
-int processNewData(int clientFd, std::vector<struct pollfd> &pollFds, const Config *config, int wasHeadersParsed)
-{
-    std::string &clientBuffer = getClientBuffer(clientFd);
-    int shouldContinue;
-
-    if (clientBuffer.length() > MAX_REQUEST_BUFFER)
-        return (handleBufferOverflow(clientFd, pollFds));
-    if (!wasHeadersParsed && areHeadersParsed(clientFd))
-    {
-        checkHeadersForBodySize(clientFd, pollFds, config, &shouldContinue);
-        if (!shouldContinue)
-            return (1);
-    }
-    if (isRequestComplete(clientFd))
-    {
-        if (clientBuffer.length() > MAX_REQUEST_BUFFER)
-            return (handleBufferOverflow(clientFd, pollFds));
-        parseAndHandleRequest(clientBuffer.c_str(), clientBuffer.length(),
-                              clientFd, pollFds, config);
-        clearClientBuffer(clientFd);
-    }
-    return (1);
 }

@@ -6,19 +6,14 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/19 00:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 09:59:58 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 #include <map>
 
-static std::map<int, ClientRequestBuffer> &getClientBuffers(void)
-{
-    static std::map<int, ClientRequestBuffer> clientBuffers;
-
-    return (clientBuffers);
-}
+std::map<int, ClientRequestBuffer> &getClientBuffers(void);
 
 std::string &getClientBuffer(int clientFd)
 {
@@ -27,7 +22,14 @@ std::string &getClientBuffer(int clientFd)
 
 void clearClientBuffer(int clientFd)
 {
-    getClientBuffers().erase(clientFd);
+    std::map<int, ClientRequestBuffer> &buffers = getClientBuffers();
+    std::map<int, ClientRequestBuffer>::iterator it = buffers.find(clientFd);
+    if (it != buffers.end())
+    {
+        std::string empty;
+        it->second.buffer.swap(empty);
+        buffers.erase(it);
+    }
 }
 
 int areHeadersParsed(int clientFd)
@@ -43,23 +45,28 @@ int isRequestComplete(int clientFd)
     size_t headerEnd;
     size_t contentLength;
     size_t terminatorPos;
+    std::string buffer = clientBuffer.buffer;
 
-    headerEnd = findHeaderEnd(clientBuffer.buffer);
+    headerEnd = findHeaderEnd(buffer);
     if (headerEnd == std::string::npos)
         return (0);
     if (!clientBuffer.headersParsed)
     {
         clientBuffer.headersParsed = 1;
-        contentLength = parseContentLength(clientBuffer.buffer);
+        contentLength = parseContentLength(buffer);
         clientBuffer.expectedBodySize = contentLength;
     }
-    if (clientBuffer.buffer.find("Transfer-Encoding: chunked") < headerEnd ||
-        clientBuffer.buffer.find("transfer-encoding: chunked") < headerEnd)
+    if (buffer.find("Transfer-Encoding: chunked") != std::string::npos ||
+        buffer.find("transfer-encoding: chunked") != std::string::npos)
     {
-        terminatorPos = clientBuffer.buffer.find("\r\n0\r\n\r\n", headerEnd);
+        terminatorPos = buffer.find("0\r\n\r\n", headerEnd);
         if (terminatorPos == std::string::npos)
-            terminatorPos = clientBuffer.buffer.find("\n0\n\n", headerEnd);
+            terminatorPos = buffer.find("0\n\n", headerEnd);
         return (terminatorPos != std::string::npos);
     }
-    return (clientBuffer.buffer.length() - headerEnd >= clientBuffer.expectedBodySize);
+    if (clientBuffer.expectedBodySize == 0)
+        return (1);
+    if (buffer.length() - headerEnd >= clientBuffer.expectedBodySize)
+        return (1);
+    return (0);
 }

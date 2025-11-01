@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/19 14:30:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 09:59:59 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,7 @@ void initConfigState(configData &state)
     state.currentLocation.acceptedMethods.push_back("GET");
 }
 
-void processConfigLine(const std::string &line, configData &state,
-                       std::vector<ServerConfig> &serverConfigs)
+void processConfigLine(const std::string &line, configData &state, std::vector<ServerConfig> &serverConfigs)
 {
     if (line.empty() || isComment(line))
         return;
@@ -34,8 +33,7 @@ void processConfigLine(const std::string &line, configData &state,
         parseLocationDirective(line, state.currentLocation);
 }
 
-void finalizeConfigParsing(configData &state,
-                           std::vector<ServerConfig> &serverConfigs)
+void finalizeConfigParsing(configData &state, std::vector<ServerConfig> &serverConfigs)
 {
     if (state.depth >= 0)
     {

@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:36 by emgul            #+#    #+#              */
-/*   Updated: 2025/10/20 19:54:03 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/01 09:59:59 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,12 +39,30 @@ struct PendingResponse
 {
     std::string data;
     size_t offset;
+    bool shouldClose;
+};
+
+struct ResponseQueueEntry
+{
+    std::string data;
+    bool shouldClose;
+};
+
+struct CgiSelectState
+{
+    int inputFd;
+    int outputFd;
+    int inputDone;
+    size_t totalWritten;
+    const std::string *bodyData;
+    std::string *output;
 };
 
 int parseRequestLine(const std::string &line, HttpRequest &req);
 int parseHeader(const std::string &line, HttpRequest &req);
 int processRequestData(const char *data, size_t len, HttpRequest &req);
 std::string buildHttpResponse(HttpResponse &res);
+std::string buildHttpResponseHeadersOnly(HttpResponse &res);
 void printHttpRequest(const HttpRequest &req);
 std::string decodeChunkedBody(const std::string &body);
 int validateHttpRequest(const HttpRequest &req);
@@ -64,8 +82,6 @@ std::string resolveFilePath(const std::string &uri, const HttpRequest &req,
                             const Config *config);
 void getLocationSettings(const HttpRequest &req, const Config *config,
                          std::string &root, std::string &index);
-const LocationConfig *getLocationConfig(const HttpRequest &req,
-                                        const Config *config);
 const ServerConfig *findServerByHost(const Config *config, const std::string &host, int port);
 std::string stripPortFromHost(const std::string &host);
 const LocationConfig *findLocation(const HttpRequest &req, const Config *config);
@@ -74,6 +90,7 @@ void resolveRoot(const LocationConfig *location, const ServerConfig *server, std
 std::string getHostFromRequest(const HttpRequest &req);
 int getPortFromHostHeader(const HttpRequest &req);
 const ServerConfig *findServerByPort(const Config *config, int port);
+const ServerConfig *findFirstServer(const Config *config);
 const LocationConfig *getDefaultLocation(const Config *config);
 std::string stripQueryString(const std::string &uri);
 int isUriMatchingLocation(const std::string &uri, const std::string &locationPath);
@@ -84,17 +101,23 @@ std::string getMimeType(const std::string &path);
 HttpResponse handleGetRequest(const HttpRequest &req, const Config *config);
 HttpResponse handlePostRequest(const HttpRequest &req, const Config *config);
 HttpResponse handleDeleteRequest(const HttpRequest &req, const Config *config);
-void setPendingResponse(int clientFd, const std::string &response);
+HttpResponse handlePutRequest(const HttpRequest &req, const Config *config);
+void setPendingResponse(int clientFd, const std::string &response, bool shouldClose = false);
 int hasPendingResponse(int clientFd);
 int sendPendingResponse(int clientFd);
 void clearPendingResponse(int clientFd);
+bool shouldCloseConnection(int clientFd);
 HttpResponse executeCgiScript(const std::string &scriptPath, const std::string &interpreter, const HttpRequest &req, const Config *config);
 std::string getCgiInterpreter(const std::string &uri, const HttpRequest &req, const Config *config);
-char *createEnvString(const std::string &queryStr);
 std::string extractQueryString(const std::string &uri);
 std::string readCgiOutput(int fd);
 HttpResponse parseCgiOutput(const std::string &output);
-HttpResponse runCgiProcess(int pipefd[2], const std::string &scriptPath, const std::string &interpreter, const HttpRequest &req, const Config *config);
+HttpResponse runCgiProcess(int inputPipe[2], int outputPipe[2], const std::string &scriptPath, const std::string &interpreter, const HttpRequest &req, const Config *config);
 int isMethodAllowed(const HttpRequest &req, const Config *config);
 void parseHeadersFromCgi(const std::string &headers, HttpResponse &response);
 void processStatusHeaderFromCgi(HttpResponse &response);
+int streamCgiToClient(int clientFd, int cgiOutputFd, pid_t cgiPid);
+void buildCgiEnvironment(std::vector<std::string> &envStrings, const std::string &queryStr,
+                         const HttpRequest &req);
+void convertEnvToCharArray(const std::vector<std::string> &envStrings,
+                           std::vector<char *> &envVec);
