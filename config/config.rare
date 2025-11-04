@@ -17,7 +17,6 @@ server {
     location /
 	{
         index index.py;
-        accepted_methods GET POST;
         cgi_pass .py /usr/bin/python3;
         cgi_pass .pl /usr/bin/perl;
     }
@@ -30,6 +29,7 @@ server {
     location /restricted
 	{
         accepted_methods GET;
+        root /home/mr246/Documents/webserv/www/hogwarts/restricted;
     }
 }
 

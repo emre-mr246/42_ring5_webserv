@@ -1,5 +1,3 @@
 .vscode
 *.o
 webserv
-www/hogwarts/uploads/*
-www/hogwarts/restricted/*
