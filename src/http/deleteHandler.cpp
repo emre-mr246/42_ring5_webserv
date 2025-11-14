@@ -6,13 +6,12 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 08:12:21 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/04 12:22:15 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/14 03:22:31 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http.hpp"
 #include "webserv.hpp"
-#include <unistd.h>
 
 static HttpResponse createDeleteSuccessResponse(void)
 {
@@ -24,13 +23,11 @@ static HttpResponse createDeleteSuccessResponse(void)
     return (response);
 }
 
-static int deleteFileFromPath(const std::string &path)
+static int checkFileExists(const std::string &path)
 {
     if (access(path.c_str(), F_OK) != 0)
         return (0);
-    if (unlink(path.c_str()) == 0)
-        return (1);
-    return (0);
+    return (1);
 }
 
 HttpResponse handleDeleteRequest(const HttpRequest &req, const Config *config)
@@ -40,7 +37,7 @@ HttpResponse handleDeleteRequest(const HttpRequest &req, const Config *config)
     filePath = resolveFilePath(req.uri, req, config);
     if (filePath.empty())
         return (createErrorResponse(403));
-    if (!deleteFileFromPath(filePath))
+    if (!checkFileExists(filePath))
         return (createErrorResponse(404));
     return (createDeleteSuccessResponse());
 }

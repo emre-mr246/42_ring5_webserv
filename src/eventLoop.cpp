@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:15:47 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/04 12:22:15 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/14 03:22:30 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ static int isServerFd(const std::vector<int> &serverFds, int fd)
     return (0);
 }
 
-static void processEvents(std::vector<struct pollfd> &pollFds,
+static void processEvents(std::vector<pollfd> &pollFds,
                           const std::vector<int> &serverFds,
                           const Config *config)
 {
@@ -55,12 +55,11 @@ static void processEvents(std::vector<struct pollfd> &pollFds,
 
 void eventLoop(const std::vector<int> &serverFds, const Config *config)
 {
-    std::vector<struct pollfd> pollFds;
+    std::vector<pollfd> pollFds;
 
     initPollServer(pollFds, serverFds);
-    while (1)
+    while (!getShutdownFlag())
     {
-        checkClientTimeouts(pollFds);
         if (waitForEvents(pollFds) > 0)
             processEvents(pollFds, serverFds, config);
     }

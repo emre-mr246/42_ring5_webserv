@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 12:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/04 12:22:14 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/14 03:22:30 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,12 @@ std::map<int, std::vector<ResponseQueueEntry> > &getResponseQueues(void)
     static std::map<int, std::vector<ResponseQueueEntry> > responseQueues;
 
     return (responseQueues);
+}
+
+void cleanupResponseQueues(void)
+{
+    getPendingResponses().clear();
+    getResponseQueues().clear();
 }
 
 static int loadNextQueuedResponse(int clientFd, std::vector<ResponseQueueEntry> &queue)

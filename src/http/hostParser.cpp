@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 08:12:21 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/04 12:22:15 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/14 03:22:31 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,16 +42,6 @@ int parsePortString(const std::string &portStr)
     return (80);
 }
 
-static int getServerPortOrDefault(int serverFd)
-{
-    int port;
-
-    port = getPortFromServerFd(serverFd);
-    if (port > 0)
-        return (port);
-    return (80);
-}
-
 static std::string getHostHeaderValue(const HttpRequest &req)
 {
     std::map<std::string, std::string>::const_iterator hostIt;
@@ -64,6 +54,17 @@ static std::string getHostHeaderValue(const HttpRequest &req)
     return (hostIt->second);
 }
 
+static int getPortFromSocket(int clientFd)
+{
+    sockaddr_in addr;
+    socklen_t addrLen;
+
+    addrLen = sizeof(addr);
+    if (getsockname(clientFd, (sockaddr *)&addr, &addrLen) == -1)
+        return (80);
+    return (ntohs(addr.sin_port));
+}
+
 int getPortFromHostHeader(const HttpRequest &req)
 {
     std::string host;
@@ -72,21 +73,22 @@ int getPortFromHostHeader(const HttpRequest &req)
 
     host = getHostHeaderValue(req);
     if (host.empty())
-        return (getServerPortOrDefault(req.serverFd));
+        return (getPortFromSocket(req.clientFd));
     colonPos = host.find(':');
     if (colonPos == std::string::npos)
-        return (getServerPortOrDefault(req.serverFd));
+        return (getPortFromSocket(req.clientFd));
     portStr = host.substr(colonPos + 1);
     return (parsePortString(portStr));
 }
 
 const ServerConfig *findServerByPort(const Config *config, int port)
 {
-    std::vector<ServerConfig>::const_iterator it;
-    std::vector<std::pair<std::string, int> >::const_iterator addrIt;
+    ServerConfigList::const_iterator it;
+    const ServerConfigList &servers = config->getServers();
+    AddressList::const_iterator addrIt;
 
-    it = config->getServerConfigs().begin();
-    while (it != config->getServerConfigs().end())
+    it = servers.begin();
+    while (it != servers.end())
     {
         addrIt = it->listenOn.begin();
         while (addrIt != it->listenOn.end())

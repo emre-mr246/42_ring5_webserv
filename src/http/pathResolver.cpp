@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/05 13:39:50 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/04 12:22:15 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/14 03:22:31 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,8 @@ static std::string stripLocationPrefix(const std::string &uri, const std::string
         return (uri);
     if (uri.length() == locationPath.length())
         return (std::string("/"));
+    if (uri[locationPath.length()] != '/')
+        return (uri);
     return (uri.substr(locationPath.length()));
 }
 

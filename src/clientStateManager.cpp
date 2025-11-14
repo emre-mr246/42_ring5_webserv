@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 12:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/04 12:22:15 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/14 03:22:31 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,14 @@
 
 std::map<int, ClientRequestBuffer> &getClientBuffers(void)
 {
-    static std::map<int, ClientRequestBuffer> clientBuffers;
+    static std::map<int, ClientRequestBuffer> buffers;
 
-    return (clientBuffers);
+    return (buffers);
+}
+
+void cleanupClientBuffers(void)
+{
+    getClientBuffers().clear();
 }
 
 int getClientServerFd(int clientFd)
@@ -32,8 +37,9 @@ void setClientServerFd(int clientFd, int serverFd)
 
 void resetClientState(int clientFd)
 {
-    ClientRequestBuffer &clientBuffer = getClientBuffers()[clientFd];
+    ClientRequestBuffer *clientBuffer;
 
-    clientBuffer.headersParsed = 0;
-    clientBuffer.expectedBodySize = 0;
+    clientBuffer = &getClientBuffers()[clientFd];
+    clientBuffer->headersParsed = 0;
+    clientBuffer->expectedBodySize = 0;
 }

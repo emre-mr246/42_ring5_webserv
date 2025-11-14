@@ -6,13 +6,32 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 20:20:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/04 12:22:15 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/14 03:22:31 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-void addUniqueAddress(std::vector<std::pair<std::string, int> > &addresses, const std::string &host, int port)
+static int g_shutdown = 0;
+
+static void signalHandler(int)
+{
+    g_shutdown = 1;
+}
+
+int getShutdownFlag(void)
+{
+    return (g_shutdown);
+}
+
+void initializeSignals(void)
+{
+    signal(SIGPIPE, SIG_IGN);
+    signal(SIGINT, signalHandler);
+    signal(SIGTERM, signalHandler);
+}
+
+void addToAddressList(AddressList &addresses, const std::string &host, int port)
 {
     size_t i;
 
@@ -26,9 +45,9 @@ void addUniqueAddress(std::vector<std::pair<std::string, int> > &addresses, cons
     addresses.push_back(std::make_pair(host, port));
 }
 
-void gatherAddresses(const Config &config, std::vector<std::pair<std::string, int> > &addresses)
+void gatherAddresses(const Config &config, AddressList &addresses)
 {
-    const std::vector<ServerConfig> &servers = config.getServerConfigs();
+    const ServerConfigList &servers = config.getServers();
     size_t i;
     size_t j;
 
@@ -38,14 +57,14 @@ void gatherAddresses(const Config &config, std::vector<std::pair<std::string, in
         j = 0;
         while (j < servers[i].listenOn.size())
         {
-            addUniqueAddress(addresses, servers[i].listenOn[j].first,
+            addToAddressList(addresses, servers[i].listenOn[j].first,
                              servers[i].listenOn[j].second);
             j++;
         }
         i++;
     }
     if (addresses.empty())
-        addUniqueAddress(addresses, "0.0.0.0", 8080);
+        addToAddressList(addresses, "0.0.0.0", 8080);
 }
 
 static std::map<int, int> &getServerFdToPortMap(void)
@@ -56,13 +75,20 @@ static std::map<int, int> &getServerFdToPortMap(void)
 
 int getPortFromServerFd(int serverFd)
 {
-    std::map<int, int>::iterator it = getServerFdToPortMap().find(serverFd);
+    std::map<int, int>::iterator it;
+
+    it = getServerFdToPortMap().find(serverFd);
     if (it != getServerFdToPortMap().end())
         return (it->second);
     return (-1);
 }
 
-int openServerSockets(const std::vector<std::pair<std::string, int> > &addresses, std::vector<int> &fds)
+void cleanupServerFdMap(void)
+{
+    getServerFdToPortMap().clear();
+}
+
+int openServerSockets(const AddressList &addresses, std::vector<int> &fds)
 {
     size_t i;
     int fd;
@@ -85,4 +111,32 @@ int openServerSockets(const std::vector<std::pair<std::string, int> > &addresses
         return (0);
     }
     return (1);
+}
+
+std::string getConfigPath(int argc, char **argv)
+{
+    std::string configPath;
+
+    if (argc > 2)
+    {
+        std::cerr << "Usage: " << argv[0] << " [configuration file]" << std::endl;
+        return ("");
+    }
+    if (argc == 2)
+        configPath = argv[1];
+    else
+        configPath = DEFAULT_CONFIG_PATH;
+    return (configPath);
+}
+
+void cleanupSockets(const std::vector<int> &serverFds)
+{
+    size_t i;
+
+    i = 0;
+    while (i < serverFds.size())
+    {
+        close(serverFds[i]);
+        i++;
+    }
 }

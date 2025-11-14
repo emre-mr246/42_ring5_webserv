@@ -6,14 +6,14 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 12:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/04 12:22:14 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/14 03:22:30 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http.hpp"
 #include "webserv.hpp"
 
-static int handleBufferOverflow(int clientFd, std::vector<struct pollfd> &pollFds)
+static int handleBufferOverflow(int clientFd, std::vector<pollfd> &pollFds)
 {
     HttpResponse response;
     std::string responseStr;
@@ -59,7 +59,7 @@ static size_t calculateRequestBytes(const std::string &buffer)
     return (totalBytes);
 }
 
-static int processCompleteRequest(int clientFd, std::vector<struct pollfd> &pollFds,
+static int processCompleteRequest(int clientFd, std::vector<pollfd> &pollFds,
                                   const Config *config, std::string &clientBuffer)
 {
     size_t processedBytes;
@@ -79,13 +79,14 @@ static int processCompleteRequest(int clientFd, std::vector<struct pollfd> &poll
     return (1);
 }
 
-int processNewData(int clientFd, std::vector<struct pollfd> &pollFds, const Config *config, int wasHeadersParsed)
+int processNewData(int clientFd, std::vector<pollfd> &pollFds, const Config *config, int wasHeadersParsed)
 {
-    std::string &clientBuffer = getClientBuffer(clientFd);
+    std::string *clientBuffer;
     int shouldContinue;
     int isComplete;
 
-    if (clientBuffer.length() > MAX_REQUEST_BUFFER)
+    clientBuffer = &getClientBuffer(clientFd);
+    if (clientBuffer->length() > MAX_REQUEST_BUFFER)
         return (handleBufferOverflow(clientFd, pollFds));
     if (!wasHeadersParsed && areHeadersParsed(clientFd))
     {
@@ -98,6 +99,6 @@ int processNewData(int clientFd, std::vector<struct pollfd> &pollFds, const Conf
     }
     isComplete = isRequestComplete(clientFd);
     if (isComplete)
-        return (processCompleteRequest(clientFd, pollFds, config, clientBuffer));
+        return (processCompleteRequest(clientFd, pollFds, config, *clientBuffer));
     return (1);
 }

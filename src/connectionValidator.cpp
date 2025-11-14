@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 12:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/04 12:22:13 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/14 03:22:30 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ static int detectCgiInterpreter(const HttpRequest &req, const Config *config)
     return (!interpreter.empty());
 }
 
-static void sendErrorResponse(int clientFd, std::vector<struct pollfd> &pollFds,
+static void sendErrorResponse(int clientFd, std::vector<pollfd> &pollFds,
                               int statusCode, const HttpRequest &req,
                               const Config *config, int shouldClose)
 {
@@ -59,13 +59,13 @@ static void sendErrorResponse(int clientFd, std::vector<struct pollfd> &pollFds,
     clearClientBuffer(clientFd);
 }
 
-static void sendBodySizeError(int clientFd, std::vector<struct pollfd> &pollFds,
+static void sendBodySizeError(int clientFd, std::vector<pollfd> &pollFds,
                               const HttpRequest &tempReq, const Config *config)
 {
     sendErrorResponse(clientFd, pollFds, 413, tempReq, config, 1);
 }
 
-static int validateBodySize(int clientFd, std::vector<struct pollfd> &pollFds,
+static int validateBodySize(int clientFd, std::vector<pollfd> &pollFds,
                             const HttpRequest &req, const Config *config,
                             size_t contentLength, int isCgi, int *shouldContinue)
 {
@@ -86,7 +86,7 @@ static int validateBodySize(int clientFd, std::vector<struct pollfd> &pollFds,
     return (1);
 }
 
-static int validateChunkedSize(int clientFd, std::vector<struct pollfd> &pollFds,
+static int validateChunkedSize(int clientFd, std::vector<pollfd> &pollFds,
                                const HttpRequest &req, const Config *config,
                                const std::string &clientBuffer, int *shouldContinue)
 {
@@ -119,29 +119,35 @@ static void sendContinueIfExpected(int clientFd, const HttpRequest &req)
     }
 }
 
-void checkHeadersForBodySize(int clientFd, std::vector<struct pollfd> &pollFds,
+static int validateRequestBody(int clientFd, std::vector<pollfd> &pollFds,
+                               const Config *config, const HttpRequest &req,
+                               size_t contentLength, const std::string &clientBuffer, int *shouldContinue)
+{
+    int isCgi;
+
+    isCgi = detectCgiInterpreter(req, config);
+    if (!validateBodySize(clientFd, pollFds, req, config, contentLength, isCgi, shouldContinue))
+        return (0);
+    if (detectChunkedEncoding(clientBuffer) && !validateChunkedSize(clientFd, pollFds, req, config, clientBuffer, shouldContinue))
+        return (0);
+    sendContinueIfExpected(clientFd, req);
+    return (1);
+}
+
+void checkHeadersForBodySize(int clientFd, std::vector<pollfd> &pollFds,
                              const Config *config, int *shouldContinue)
 {
     HttpRequest tempReq;
-    std::string &clientBuffer = getClientBuffer(clientFd);
+    std::string *clientBuffer;
     size_t contentLength;
-    int isCgi;
-    int isChunked;
 
+    clientBuffer = &getClientBuffer(clientFd);
     *shouldContinue = 1;
-    contentLength = parseContentLength(clientBuffer);
-    isChunked = detectChunkedEncoding(clientBuffer);
-    if (!processRequestData(clientBuffer.c_str(), clientBuffer.length(), tempReq))
+    contentLength = parseContentLength(*clientBuffer);
+    if (!processRequestData(clientBuffer->c_str(), clientBuffer->length(), tempReq))
         return;
-    tempReq.serverFd = getClientServerFd(clientFd);
-    if (contentLength == 0 && !isChunked)
-        return;
+    tempReq.clientFd = clientFd;
     if (contentLength == 0)
         return;
-    isCgi = detectCgiInterpreter(tempReq, config);
-    if (!validateBodySize(clientFd, pollFds, tempReq, config, contentLength, isCgi, shouldContinue))
-        return;
-    if (isChunked && !validateChunkedSize(clientFd, pollFds, tempReq, config, clientBuffer, shouldContinue))
-        return;
-    sendContinueIfExpected(clientFd, tempReq);
+    validateRequestBody(clientFd, pollFds, config, tempReq, contentLength, *clientBuffer, shouldContinue);
 }

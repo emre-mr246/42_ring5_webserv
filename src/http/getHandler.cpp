@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/05 13:39:50 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/04 12:22:15 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/14 03:22:31 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ static HttpResponse createSuccessResponse(const std::string &content, const std:
 
 static int checkFileAccessible(const std::string &path)
 {
-    struct stat fileInfo;
+    stat_t fileInfo;
 
     if (stat(path.c_str(), &fileInfo) == -1)
         return (0);
@@ -43,7 +43,7 @@ static int checkFileAccessible(const std::string &path)
 
 static int isDirectory(const std::string &path)
 {
-    struct stat fileInfo;
+    stat_t fileInfo;
 
     if (stat(path.c_str(), &fileInfo) == -1)
         return (0);
@@ -72,11 +72,7 @@ static HttpResponse serveRegularFile(const std::string &filePath, const HttpRequ
 {
     std::string content;
     std::string mimeType;
-    std::string interpreter;
 
-    interpreter = getCgiInterpreter(filePath, req, config);
-    if (!interpreter.empty())
-        return (executeCgiScript(filePath, interpreter, req, config));
     if (readFile(filePath, content))
     {
         if (!isMethodAllowed(req, config))
@@ -94,7 +90,6 @@ static HttpResponse serveIndexFile(const std::string &filePath, const HttpReques
     std::string mimeType;
     std::string indexFile;
     std::string indexPath;
-    std::string interpreter;
     const LocationConfig *location;
 
     location = findLocation(req, config);
@@ -105,9 +100,6 @@ static HttpResponse serveIndexFile(const std::string &filePath, const HttpReques
     indexPath = getIndexForDirectory(filePath, indexFile);
     if (!indexPath.empty())
     {
-        interpreter = getCgiInterpreter(indexPath, req, config);
-        if (!interpreter.empty())
-            return (executeCgiScript(indexPath, interpreter, req, config));
         if (readFile(indexPath, content))
         {
             if (!isMethodAllowed(req, config))

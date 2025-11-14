@@ -6,85 +6,78 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/12 17:19:27 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/04 12:22:15 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/14 03:22:30 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 #include <netdb.h>
 
-static void setupAddrInfoHints(struct addrinfo &hints, int family)
+int getAddressInfo(const std::string &host, int port, addrinfo **res)
 {
-    memset(&hints, 0, sizeof(hints));
-    hints.ai_family = family;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_flags = AI_PASSIVE;
-}
-
-static int resolveAddressInfo(const std::string &host, const std::string &portStr,
-                              struct addrinfo &hints, struct addrinfo **res)
-{
-    int result;
-    std::string errorMsg;
+    addrinfo hints;
+    std::ostringstream portStr;
     const char *hostPtr;
 
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;
+    hints.ai_protocol = 0;
+    hints.ai_addr = NULL;
+    hints.ai_canonname = NULL;
+    hints.ai_next = NULL;
+    hints.ai_addrlen = 0;
+    portStr << port;
     if (host.empty())
         hostPtr = NULL;
     else
         hostPtr = host.c_str();
-    result = getaddrinfo(hostPtr, portStr.c_str(), &hints, res);
-    if (result != 0)
-    {
-        errorMsg = "getaddrinfo(): ";
-        errorMsg += gai_strerror(result);
-        printError(errorMsg);
-    }
-    return (result);
+    if (getaddrinfo(hostPtr, portStr.str().c_str(), &hints, res) != 0)
+        return (-1);
+    return (0);
 }
 
-static struct addrinfo *findBindableAddress(int fd, struct addrinfo *addressList)
+int tryBindToAddresses(int fd, addrinfo *res)
 {
-    struct addrinfo *it;
-    int bindResult;
+    addrinfo *it;
 
-    it = addressList;
+    it = res;
     while (it)
     {
-        bindResult = bind(fd, it->ai_addr, it->ai_addrlen);
-        if (bindResult == 0)
-            return (it);
+        if (bind(fd, it->ai_addr, it->ai_addrlen) == 0)
+            return (0);
         it = it->ai_next;
     }
     printError("bind()");
-    return (NULL);
+    return (-1);
 }
 
-static int listenOnSocket(int fd, int backlog, struct addrinfo *boundAddress)
+int startListening(int fd, int backlog)
 {
-    if (!boundAddress)
-        return (0);
     if (listen(fd, backlog) == -1)
     {
         printError("listen()");
-        return (0);
+        return (-1);
     }
-    return (1);
+    return (0);
 }
 
-int bindServerSocket(int fd, const std::string &host, int port, int backlog, int family)
+int bindServerSocket(int fd, const std::string &host, int port, int backlog)
 {
-    struct addrinfo hints;
-    struct addrinfo *res;
-    struct addrinfo *boundAddress;
-    std::ostringstream portStr;
+    addrinfo *res;
 
-    setupAddrInfoHints(hints, family);
-    portStr << port;
-    if (resolveAddressInfo(host, portStr.str(), hints, &res) != 0)
+    if (getAddressInfo(host, port, &res) == -1)
         return (-1);
-    boundAddress = findBindableAddress(fd, res);
+    if (tryBindToAddresses(fd, res) == -1)
+    {
+        freeaddrinfo(res);
+        return (-1);
+    }
+    if (startListening(fd, backlog) == -1)
+    {
+        freeaddrinfo(res);
+        return (-1);
+    }
     freeaddrinfo(res);
-    if (!listenOnSocket(fd, backlog, boundAddress))
-        return (-1);
     return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 08:12:22 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/04 12:22:14 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/14 03:22:31 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,13 +93,13 @@ HttpResponse routeRequest(const HttpRequest &req, const Config *config)
 bool shouldCloseAfterResponse(const HttpRequest &req)
 {
     std::map<std::string, std::string>::const_iterator it;
-    bool closeFlag;
+    bool shouldClose;
 
-    closeFlag = false;
+    shouldClose = false;
     it = req.headers.find("Connection");
     if (it == req.headers.end())
         it = req.headers.find("connection");
     if (it != req.headers.end() && it->second == "close")
-        closeFlag = true;
-    return (closeFlag);
+        shouldClose = true;
+    return (shouldClose);
 }

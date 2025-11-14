@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:36 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/04 12:22:15 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/14 03:22:31 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ struct HttpRequest
     std::string version;
     std::map<std::string, std::string> headers;
     std::string body;
-    int serverFd;
+    int clientFd;
 };
 
 struct HttpResponse
@@ -62,9 +62,6 @@ int parseRequestLine(const std::string &line, HttpRequest &req);
 int parseHeader(const std::string &line, HttpRequest &req);
 int processRequestData(const char *data, size_t len, HttpRequest &req);
 std::string buildHttpResponse(HttpResponse &res);
-std::string buildHttpResponseHeadersOnly(HttpResponse &res);
-void printHttpRequest(const HttpRequest &req);
-void printHttpResponse(const HttpResponse &res);
 std::string decodeChunkedBody(const std::string &body);
 int validateHttpRequest(const HttpRequest &req);
 std::string getErrorMessage(int code);
@@ -119,7 +116,6 @@ HttpResponse runCgiProcess(int inputPipe[2], int outputPipe[2], const std::strin
 int isMethodAllowed(const HttpRequest &req, const Config *config);
 void parseHeadersFromCgi(const std::string &headers, HttpResponse &response);
 void processStatusHeaderFromCgi(HttpResponse &response);
-int streamCgiToClient(int clientFd, int cgiOutputFd, pid_t cgiPid);
 void buildCgiEnvironment(std::vector<std::string> &envStrings, const std::string &queryStr,
                          const HttpRequest &req);
 void convertEnvToCharArray(const std::vector<std::string> &envStrings,

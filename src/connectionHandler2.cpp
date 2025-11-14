@@ -6,14 +6,14 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 19:48:09 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/04 12:22:15 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/14 03:22:30 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http.hpp"
 #include "webserv.hpp"
 
-int handleClientData(std::vector<struct pollfd> &pollFds, size_t i, const Config *config)
+int handleClientData(std::vector<pollfd> &pollFds, size_t i, const Config *config)
 {
     int clientFd;
 
@@ -30,11 +30,30 @@ int handleClientData(std::vector<struct pollfd> &pollFds, size_t i, const Config
     return (1);
 }
 
-int handleClientWrite(std::vector<struct pollfd> &pollFds, size_t i)
+static int handleSendComplete(int clientFd, std::vector<pollfd> &pollFds, size_t i)
+{
+    close(clientFd);
+    clearPendingResponse(clientFd);
+    removeClientFromPoll(pollFds, i);
+    return (0);
+}
+
+static int handleSendPartial(int clientFd, std::vector<pollfd> &pollFds, int shouldClose)
+{
+    if (shouldClose)
+    {
+        close(clientFd);
+        clearPendingResponse(clientFd);
+        return (0);
+    }
+    updateClientEvents(pollFds, clientFd, POLLIN);
+    return (1);
+}
+
+int handleClientWrite(std::vector<pollfd> &pollFds, size_t i)
 {
     int clientFd;
     int status;
-    bool shouldClose;
 
     clientFd = pollFds[i].fd;
     if (!hasPendingResponse(clientFd))
@@ -42,31 +61,15 @@ int handleClientWrite(std::vector<struct pollfd> &pollFds, size_t i)
         updateClientEvents(pollFds, clientFd, POLLIN);
         return (1);
     }
-    updateClientTime(clientFd);
-    shouldClose = shouldCloseConnection(clientFd);
     status = sendPendingResponse(clientFd);
     if (status == 0)
-    {
-        close(clientFd);
-        clearPendingResponse(clientFd);
-        removeClientFromPoll(pollFds, i);
-        return (0);
-    }
+        return (handleSendComplete(clientFd, pollFds, i));
     if (status == 2)
-    {
-        if (shouldClose)
-        {
-            close(clientFd);
-            clearPendingResponse(clientFd);
-            removeClientFromPoll(pollFds, i);
-            return (0);
-        }
-        updateClientEvents(pollFds, clientFd, POLLIN);
-    }
+        return (handleSendPartial(clientFd, pollFds, shouldCloseConnection(clientFd)));
     return (1);
 }
 
-void sendErrorAndStop(int clientFd, std::vector<struct pollfd> &pollFds,
+void sendErrorAndStop(int clientFd, std::vector<pollfd> &pollFds,
                       int statusCode, int *shouldContinue)
 {
     HttpResponse response;

@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 08:12:21 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/04 12:22:14 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/14 03:22:31 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,10 +42,10 @@ void resolveRoot(const LocationConfig *location, const ServerConfig *server,
 
 const LocationConfig *getDefaultLocation(const Config *config)
 {
-    if (!config->getServerConfigs().empty())
+    if (!config->getServers().empty())
     {
-        if (!config->getServerConfigs()[0].locations.empty())
-            return (&config->getServerConfigs()[0].locations[0]);
+        if (!config->getServers()[0].locations.empty())
+            return (&config->getServers()[0].locations[0]);
     }
     return (NULL);
 }

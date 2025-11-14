@@ -6,26 +6,13 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:35 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/04 12:22:14 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/14 03:22:30 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http.hpp"
 #include "webserv.hpp"
-#include <ctime>
 #include <sstream>
-
-static std::string getCurrentDate()
-{
-    time_t now;
-    struct tm *gmtTime;
-    char buffer[100];
-
-    now = time(NULL);
-    gmtTime = gmtime(&now);
-    strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", gmtTime);
-    return (std::string(buffer));
-}
 
 static std::string getStatusMessage(int code)
 {
@@ -84,25 +71,8 @@ std::string buildHttpResponse(HttpResponse &res)
         res.statusMessage = getStatusMessage(res.statusCode);
     if (res.headers.find("Connection") == res.headers.end())
         res.headers["Connection"] = "keep-alive";
-    if (res.headers.find("Date") == res.headers.end())
-        res.headers["Date"] = getCurrentDate();
     oss << buildStatusLine(res);
     oss << buildHeaders(res);
     oss << res.body;
-    return (oss.str());
-}
-
-std::string buildHttpResponseHeadersOnly(HttpResponse &res)
-{
-    std::ostringstream oss;
-
-    if (res.statusMessage.empty())
-        res.statusMessage = getStatusMessage(res.statusCode);
-    if (res.headers.find("Connection") == res.headers.end())
-        res.headers["Connection"] = "keep-alive";
-    if (res.headers.find("Date") == res.headers.end())
-        res.headers["Date"] = getCurrentDate();
-    oss << buildStatusLine(res);
-    oss << buildHeaders(res);
     return (oss.str());
 }

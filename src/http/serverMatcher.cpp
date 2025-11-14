@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 08:12:21 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/04 12:22:15 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/14 03:22:30 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ std::string stripPortFromHost(const std::string &host)
 
 static int serverMatchesPort(const ServerConfig &server, int port)
 {
-    std::vector<std::pair<std::string, int> >::const_iterator addrIt;
+    AddressList::const_iterator addrIt;
 
     addrIt = server.listenOn.begin();
     while (addrIt != server.listenOn.end())
@@ -40,7 +40,7 @@ static int serverMatchesPort(const ServerConfig &server, int port)
 static int serverMatchesName(const ServerConfig &server,
                              const std::string &host)
 {
-    std::vector<std::string>::const_iterator nameIt;
+    StringVector::const_iterator nameIt;
 
     nameIt = server.serverNames.begin();
     while (nameIt != server.serverNames.end())
@@ -55,10 +55,11 @@ static int serverMatchesName(const ServerConfig &server,
 const ServerConfig *findServerByHost(const Config *config,
                                      const std::string &host, int port)
 {
-    std::vector<ServerConfig>::const_iterator serverIt;
+    ServerConfigList::const_iterator serverIt;
+    const ServerConfigList &servers = config->getServers();
 
-    serverIt = config->getServerConfigs().begin();
-    while (serverIt != config->getServerConfigs().end())
+    serverIt = servers.begin();
+    while (serverIt != servers.end())
     {
         if (serverMatchesPort(*serverIt, port))
         {
@@ -72,7 +73,7 @@ const ServerConfig *findServerByHost(const Config *config,
 
 const ServerConfig *findFirstServer(const Config *config)
 {
-    const std::vector<ServerConfig> &servers = config->getServerConfigs();
+    const std::vector<ServerConfig> &servers = config->getServers();
     if (servers.empty())
         return (NULL);
     return (&servers[0]);

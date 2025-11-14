@@ -6,18 +6,19 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 08:12:21 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/04 12:22:15 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/14 03:22:30 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http.hpp"
 #include "webserv.hpp"
 
-void handleParseError(const char *buf, ssize_t bytesRead, int clientFd, std::vector<struct pollfd> &pollFds)
+void handleParseError(const char *buf, ssize_t bytesRead, int clientFd, std::vector<pollfd> &pollFds)
 {
     HttpResponse response;
     std::string responseStr;
     size_t contentLength;
+
     if ((size_t)bytesRead > MAX_REQUEST_BUFFER)
     {
         response = createErrorResponse(413);
@@ -58,14 +59,13 @@ int checkBodySizeLimit(const HttpRequest &req, const Config *config)
 }
 
 void handleRequest(const HttpRequest &req, int clientFd,
-                   std::vector<struct pollfd> &pollFds, const Config *config)
+                   std::vector<pollfd> &pollFds, const Config *config)
 {
     HttpResponse response;
     std::string responseStr;
     bool shouldClose;
 
     response = routeRequest(req, config);
-    printHttpResponse(response);
     shouldClose = shouldCloseAfterResponse(req);
     if (shouldClose)
         response.headers["Connection"] = "close";

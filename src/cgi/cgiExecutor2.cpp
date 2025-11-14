@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 16:30:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/04 12:22:14 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/14 03:22:30 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ static void executeCgiChild(int inputFd, int outputFd, const std::string &script
         delete[] envVec[i];
         i++;
     }
-    exit(1);
+    return;
 }
 
 static HttpResponse createCgiResponse(int status, const std::string &output,
@@ -108,8 +108,7 @@ static int handleCgiOutput(int outputFd, std::string &output)
 }
 
 static void initializeCgiState(CgiSelectState &state, int inputFd, int outputFd,
-                               const std::string &bodyData, std::string &output,
-                               pid_t pid)
+                               const std::string &bodyData, std::string &output)
 {
     state.inputFd = inputFd;
     state.outputFd = outputFd;
@@ -117,7 +116,6 @@ static void initializeCgiState(CgiSelectState &state, int inputFd, int outputFd,
     state.totalWritten = 0;
     state.bodyData = &bodyData;
     state.output = &output;
-    trackCgiProcess(pid);
 }
 
 static void setupSelectFds(fd_set &readSet, fd_set &writeSet, CgiSelectState &state,
@@ -149,10 +147,7 @@ static int processSelectEvents(fd_set &readSet, fd_set &writeSet, CgiSelectState
 
 static void waitForCgiProcess(pid_t pid, int &status)
 {
-    while (waitpid(pid, &status, WNOHANG) == 0)
-    {
-        usleep(500);
-    }
+    waitpid(pid, &status, 0);
 }
 
 static pid_t forkCgiChild(int inputPipe[2], int outputPipe[2],
@@ -192,12 +187,12 @@ static int setupNonblockingPipes(int inputPipe[2], int outputPipe[2])
     return (1);
 }
 
-static void runCgiSelectLoop(CgiSelectState &state, pid_t pid)
+static void runCgiSelectLoop(CgiSelectState &state)
 {
     fd_set readSet;
     fd_set writeSet;
     int maxFd;
-    struct timeval timeout;
+    timeval timeout;
     int selectResult;
     int timeoutCount;
 
@@ -213,14 +208,12 @@ static void runCgiSelectLoop(CgiSelectState &state, pid_t pid)
         if (selectResult == 0)
         {
             timeoutCount++;
-            if (timeoutCount > 60000)
+            if (timeoutCount > 100)
                 break;
         }
         else
             timeoutCount = 0;
         if (!processSelectEvents(readSet, writeSet, state))
-            break;
-        if (checkCgiTimeout(pid))
             break;
     }
 }
@@ -231,8 +224,8 @@ static std::string handleCgiWithSelect(int inputFd, int outputFd, pid_t pid,
     CgiSelectState state;
     std::string output;
 
-    initializeCgiState(state, inputFd, outputFd, bodyData, output, pid);
-    runCgiSelectLoop(state, pid);
+    initializeCgiState(state, inputFd, outputFd, bodyData, output);
+    runCgiSelectLoop(state);
     close(outputFd);
     waitForCgiProcess(pid, status);
     return (output);

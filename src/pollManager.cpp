@@ -6,15 +6,15 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:15:47 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/04 12:22:14 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/14 03:22:30 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-void initPollServer(std::vector<struct pollfd> &pollFds, const std::vector<int> &serverFds)
+void initPollServer(std::vector<pollfd> &pollFds, const std::vector<int> &serverFds)
 {
-    struct pollfd entry;
+    pollfd entry;
     size_t i;
 
     pollFds.clear();
@@ -29,27 +29,25 @@ void initPollServer(std::vector<struct pollfd> &pollFds, const std::vector<int> 
     }
 }
 
-void addClientToPoll(std::vector<struct pollfd> &pollFds, int clientFd)
+void addClientToPoll(std::vector<pollfd> &pollFds, int clientFd)
 {
-    struct pollfd clientPoll;
+    pollfd clientPoll;
 
     clientPoll.fd = clientFd;
     clientPoll.events = POLLIN;
     clientPoll.revents = 0;
     pollFds.push_back(clientPoll);
-    updateClientTime(clientFd);
 }
 
-void removeClientFromPoll(std::vector<struct pollfd> &pollFds, size_t index)
+void removeClientFromPoll(std::vector<pollfd> &pollFds, size_t index)
 {
     if (index < pollFds.size())
     {
-        removeClientTime(pollFds[index].fd);
         pollFds.erase(pollFds.begin() + index);
     }
 }
 
-void updateClientEvents(std::vector<struct pollfd> &pollFds, int clientFd,
+void updateClientEvents(std::vector<pollfd> &pollFds, int clientFd,
                         short events)
 {
     size_t i;
@@ -66,13 +64,13 @@ void updateClientEvents(std::vector<struct pollfd> &pollFds, int clientFd,
     }
 }
 
-int waitForEvents(std::vector<struct pollfd> &pollFds)
+int waitForEvents(std::vector<pollfd> &pollFds)
 {
     int result;
 
     while (1)
     {
-        result = poll(pollFds.data(), pollFds.size(), -1);
+        result = poll(pollFds.data(), pollFds.size(), POLL_TIMEOUT_MSEC);
         if (result != -1)
             return (result);
     }

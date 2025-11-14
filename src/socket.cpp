@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:15:47 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/04 12:22:15 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/14 03:22:30 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ int createListeningSocket(const std::string &host, int port)
     if (fd == -1)
         return (-1);
     if (setReuseaddr(fd) == -1 || setNonblocking(fd) == -1 ||
-        bindServerSocket(fd, host, port, BACKLOG, family) == -1)
+        bindServerSocket(fd, host, port, BACKLOG) == -1)
     {
         close(fd);
         return (-1);

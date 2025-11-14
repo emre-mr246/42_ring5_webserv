@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 21:32:43 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/04 12:22:15 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/14 03:22:31 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,16 @@
 
 #define DEFAULT_CONFIG_PATH "config/config.rare"
 
+typedef std::vector<std::string> StringVector;
+typedef std::pair<std::string, int> AddressPair;
+typedef std::vector<std::pair<std::string, int> > AddressList;
+
 struct LocationConfig
 {
     std::string path;
     std::string root;
     std::string indexFile;
-    std::vector<std::string> acceptedMethods;
+    StringVector acceptedMethods;
     size_t clientMaxBodySize;
     std::map<std::string, std::string> cgiPass;
     std::map<int, std::string> errorPages;
@@ -33,13 +37,15 @@ struct LocationConfig
 
 struct ServerConfig
 {
-    std::vector<std::pair<std::string, int> > listenOn;
-    std::vector<std::string> serverNames;
+    AddressList listenOn;
+    StringVector serverNames;
     std::string root;
     std::map<int, std::string> errorPages;
     size_t clientMaxBodySize;
     std::vector<LocationConfig> locations;
 };
+
+typedef std::vector<ServerConfig> ServerConfigList;
 
 struct configData
 {
@@ -59,7 +65,7 @@ class Config
     ~Config();
 
     int loadConfig(const std::string &filePath);
-    const std::vector<ServerConfig> &getServerConfigs() const;
+    const std::vector<ServerConfig> &getServers() const;
 };
 
 int readConfigFile(const std::string &filePath, std::vector<ServerConfig> &serverConfigs);
@@ -91,7 +97,3 @@ void addCgiPass(const std::string &line, LocationConfig &location);
 std::vector<std::string> extractServerNames(const std::string &line);
 int validateServerConfig(const ServerConfig &server);
 int validateAllServers(const std::vector<ServerConfig> &servers);
-void printConfig(const Config &serverConfig);
-void printAcceptedMethods(const std::vector<std::string> &acceptedMethods);
-void printCgiPasses(const std::map<std::string, std::string> &cgiPass);
-void printSingleLocation(const LocationConfig &location);

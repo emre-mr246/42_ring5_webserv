@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 21:07:50 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/04 12:22:14 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/14 03:22:31 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,10 @@
 
 Config::Config() {}
 
-Config::~Config() {}
+Config::~Config()
+{
+    serverConfigs.clear();
+}
 
 int Config::loadConfig(const std::string &filePath)
 {
@@ -36,7 +39,7 @@ int Config::loadConfig(const std::string &filePath)
     return (1);
 }
 
-const std::vector<ServerConfig> &Config::getServerConfigs() const
+const std::vector<ServerConfig> &Config::getServers() const
 {
     return (serverConfigs);
 }
@@ -52,8 +55,6 @@ int readConfigFile(const std::string &filePath,
                   << std::endl;
         return (0);
     }
-    if (DEBUG_MODE)
-        std::cout << "[INFO] Reading configuration file..." << std::endl;
     parserConfig(configFile, serverConfigs);
     configFile.close();
     return (1);
