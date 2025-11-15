@@ -68,8 +68,15 @@ server {
 	{
 		root /home/mr246/Documents/webserv/www/YoupiBanane;
 		index youpi.bad_extension;
-		accepted_methods GET POST;
+		accepted_methods POST;
 		client_max_body_size 104857600;
-		cgi_pass .bla /home/mr246/Documents/webserv/ubuntu_cgi_tester;
+		cgi_pass .bla /usr/bin/ubuntu_cgi_tester;
+    }
+	location /directory
+	{
+		root /home/mr246/Documents/webserv/www/YoupiBanane;
+		index youpi.bad_extension;
+        accepted_methods GET;
+		client_max_body_size 104857600;
     }
 }

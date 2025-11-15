@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 08:12:21 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/14 03:22:30 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/15 04:36:27 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,14 +46,55 @@ int isUriMatchingLocation(const std::string &uri,
     return (0);
 }
 
-const LocationConfig *findBestMatchingLocation(const ServerConfig *server, const std::string &cleanUri)
+static int isMethodAllowedForLocation(const LocationConfig &location, const std::string &method)
+{
+    size_t j;
+
+    if (location.acceptedMethods.empty())
+        return (1);
+    j = 0;
+    while (j < location.acceptedMethods.size())
+    {
+        if (location.acceptedMethods[j] == method)
+            return (1);
+        j++;
+    }
+    return (0);
+}
+
+static void updateMatchesIfBetter(const LocationConfig &location, size_t locationLen,
+                                  const LocationConfig *&bestMatch, size_t &bestMatchLen,
+                                  const LocationConfig *&fallbackMatch, size_t &fallbackMatchLen,
+                                  int methodAllowed)
+{
+    if (methodAllowed)
+    {
+        if (locationLen > bestMatchLen)
+        {
+            bestMatch = &location;
+            bestMatchLen = locationLen;
+        }
+    }
+    else if (!fallbackMatch || locationLen > fallbackMatchLen)
+    {
+        fallbackMatch = &location;
+        fallbackMatchLen = locationLen;
+    }
+}
+
+const LocationConfig *findBestMatchingLocation(const ServerConfig *server, const std::string &cleanUri, const std::string &method)
 {
     const LocationConfig *bestMatch;
+    const LocationConfig *fallbackMatch;
     size_t bestMatchLen;
+    size_t fallbackMatchLen;
     size_t i;
+    int methodAllowed;
 
     bestMatch = NULL;
+    fallbackMatch = NULL;
     bestMatchLen = 0;
+    fallbackMatchLen = 0;
     i = 0;
     while (i < server->locations.size())
     {
@@ -61,13 +102,18 @@ const LocationConfig *findBestMatchingLocation(const ServerConfig *server, const
         {
             if (server->locations[i].path.length() > bestMatchLen)
             {
-                bestMatch = &server->locations[i];
-                bestMatchLen = server->locations[i].path.length();
+                methodAllowed = isMethodAllowedForLocation(server->locations[i], method);
+                updateMatchesIfBetter(server->locations[i], server->locations[i].path.length(),
+                                      bestMatch, bestMatchLen,
+                                      fallbackMatch, fallbackMatchLen,
+                                      methodAllowed);
             }
         }
         i++;
     }
-    return (bestMatch);
+    if (bestMatch)
+        return (bestMatch);
+    return (fallbackMatch);
 }
 
 const LocationConfig *findLocation(const HttpRequest &req, const Config *config)
@@ -89,7 +135,7 @@ const LocationConfig *findLocation(const HttpRequest &req, const Config *config)
     if (server)
     {
         cleanUri = stripQueryString(req.uri);
-        return (findBestMatchingLocation(server, cleanUri));
+        return (findBestMatchingLocation(server, cleanUri, req.method));
     }
     return (getDefaultLocation(config));
 }

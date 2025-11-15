@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 10:51:54 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/14 03:22:31 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/15 04:36:27 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,17 +30,17 @@ struct HttpResponse;
 #include <unistd.h>
 #include <vector>
 
-#define BACKLOG 2048
-#define CLIENT_TIMEOUT 1800
-#define CGI_TIMEOUT 30
+#define BACKLOG 4096
+#define CLIENT_TIMEOUT 300
+#define CGI_TIMEOUT 30000
 #define MAX_REQUEST_BUFFER 134217728
 #define DEFAULT_BODY_SIZE 1048576
-#define CGI_CHUNK_SIZE 8388608
-#define CGI_BUFFER_SIZE 4194304
+#define CGI_CHUNK_SIZE 16777216
+#define CGI_BUFFER_SIZE 8388608
 #define CGI_OUTPUT_MAX_SIZE 134217728
-#define FILE_READ_BUFFER_SIZE 131072
-#define SELECT_TIMEOUT_USEC 1000
-#define POLL_TIMEOUT_MSEC 10
+#define FILE_READ_BUFFER_SIZE 262144
+#define SELECT_TIMEOUT_USEC 100
+#define POLL_TIMEOUT_MSEC 5
 
 typedef struct sockaddr_in sockaddr_in;
 typedef struct sockaddr sockaddr;

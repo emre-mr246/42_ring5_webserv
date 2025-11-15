@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/08 13:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/14 03:22:31 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/15 04:36:27 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,8 +106,8 @@ static HttpResponse createPostSuccessResponse(void)
     return (response);
 }
 
-static int handlePostCgi(const std::string &filePath, const HttpRequest &req,
-                         const Config *config, HttpResponse &response)
+int handleCgiRequest(const std::string &filePath, const HttpRequest &req,
+                     const Config *config, HttpResponse &response)
 {
     std::string interpreter;
 
@@ -151,13 +151,11 @@ HttpResponse handlePostRequest(const HttpRequest &req, const Config *config)
 {
     std::string filePath;
     HttpResponse response;
-    int isCgi;
 
     filePath = resolveFilePath(req.uri, req, config);
     if (!filePath.empty())
     {
-        isCgi = handlePostCgi(filePath, req, config, response);
-        if (isCgi)
+        if (handleCgiRequest(filePath, req, config, response))
             return (response);
     }
     return (handlePostFileUpload(req, config));

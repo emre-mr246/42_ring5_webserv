@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:36 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/14 03:22:31 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/15 04:36:27 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include "config.hpp"
 #include <map>
 #include <string>
+#include <sys/select.h>
 #include <vector>
 
 struct HttpRequest
@@ -92,7 +93,7 @@ const ServerConfig *findFirstServer(const Config *config);
 const LocationConfig *getDefaultLocation(const Config *config);
 std::string stripQueryString(const std::string &uri);
 int isUriMatchingLocation(const std::string &uri, const std::string &locationPath);
-const LocationConfig *findBestMatchingLocation(const ServerConfig *server, const std::string &cleanUri);
+const LocationConfig *findBestMatchingLocation(const ServerConfig *server, const std::string &cleanUri, const std::string &method = "");
 int readFile(const std::string &path, std::string &content);
 int writeFile(const std::string &path, const std::string &content);
 std::string getMimeType(const std::string &path);
@@ -120,3 +121,16 @@ void buildCgiEnvironment(std::vector<std::string> &envStrings, const std::string
                          const HttpRequest &req);
 void convertEnvToCharArray(const std::vector<std::string> &envStrings,
                            std::vector<char *> &envVec);
+int handleCgiRequest(const std::string &filePath, const HttpRequest &req,
+                     const Config *config, HttpResponse &response);
+pid_t cgiChildFork(int inputPipe[2], int outputPipe[2],
+                   const std::string &scriptPath,
+                   const std::string &interpreter,
+                   const std::string &queryStr,
+                   const HttpRequest &req);
+void waitForCgiProcess(pid_t pid, int &status);
+int cgiIOSetupPipes(int inputPipe[2], int outputPipe[2]);
+int cgiIOProcessSelectEvents(fd_set &readSet, fd_set &writeSet, CgiSelectState &state);
+std::string cgiIOHandleWithSelect(int inputFd, int outputFd, pid_t pid,
+                                  const std::string &bodyData, int &status);
+void cgiSelectRun(CgiSelectState &state, pid_t pid);

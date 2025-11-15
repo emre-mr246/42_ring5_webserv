@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/05 13:39:50 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/14 03:22:31 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/15 04:36:27 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,11 +72,14 @@ static HttpResponse serveRegularFile(const std::string &filePath, const HttpRequ
 {
     std::string content;
     std::string mimeType;
+    HttpResponse response;
 
+    if (!isMethodAllowed(req, config))
+        return (createErrorResponse(403, req, config));
+    if (handleCgiRequest(filePath, req, config, response))
+        return (response);
     if (readFile(filePath, content))
     {
-        if (!isMethodAllowed(req, config))
-            return (createErrorResponse(403, req, config));
         mimeType = getMimeType(filePath);
         return (createSuccessResponse(content, mimeType));
     }
