@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:36 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/15 04:36:27 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/15 19:20:47 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,7 @@ int writeFile(const std::string &path, const std::string &content);
 std::string getMimeType(const std::string &path);
 HttpResponse handleGetRequest(const HttpRequest &req, const Config *config);
 HttpResponse handlePostRequest(const HttpRequest &req, const Config *config);
+std::string generateAutoindex(const std::string &dirPath, const std::string &requestUri);
 HttpResponse handleDeleteRequest(const HttpRequest &req, const Config *config);
 HttpResponse handlePutRequest(const HttpRequest &req, const Config *config);
 void setPendingResponse(int clientFd, const std::string &response, bool shouldClose = false);

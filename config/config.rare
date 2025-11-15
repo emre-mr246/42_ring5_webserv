@@ -17,13 +17,14 @@ server {
     location /
 	{
         index index.py;
+        autoindex on;
         cgi_pass .py /usr/bin/python3;
         cgi_pass .pl /usr/bin/perl;
     }
     location /upload
 	{
         accepted_methods POST DELETE;
-        root /home/mr246/Documents/webserv/www/hogwarts/uploads;
+        root /home/mr246/Documents/webserv/www/hogwarts/upload;
         client_max_body_size 204800;
     }
     location /restricted

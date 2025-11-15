@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 14:49:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/15 04:36:26 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/15 19:20:47 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,4 +55,21 @@ std::string extractIndex(const std::string &line)
     if (!value.empty() && value[value.length() - 1] == ';')
         value.resize(value.length() - 1);
     return (strtrim(value));
+}
+
+bool extractAutoindex(const std::string &line)
+{
+    std::string value;
+    size_t pos;
+
+    pos = line.find("autoindex");
+    if (pos == std::string::npos)
+        return (false);
+    value = strtrim(line.substr(pos + 9));
+    if (!value.empty() && value[value.length() - 1] == ';')
+        value.resize(value.length() - 1);
+    value = strtrim(value);
+    if (value == "on")
+        return (true);
+    return (false);
 }

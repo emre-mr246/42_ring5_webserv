@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/14 22:14:28 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/15 04:36:26 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/15 19:20:47 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ static void initLocation(LocationConfig &loc, const std::string &line)
     loc.clientMaxBodySize = 1048576;
     loc.indexFile = "index.html";
     loc.acceptedMethods.push_back("GET");
+    loc.autoindex = false;
 }
 
 void updateServerBlockState(const std::string &line, configData &state,

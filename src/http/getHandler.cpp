@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/05 13:39:50 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/15 04:36:27 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/15 19:20:47 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,7 @@ static HttpResponse serveIndexFile(const std::string &filePath, const HttpReques
     std::string indexFile;
     std::string indexPath;
     const LocationConfig *location;
+    HttpResponse response;
 
     location = findLocation(req, config);
     if (location && !location->indexFile.empty())
@@ -109,6 +110,21 @@ static HttpResponse serveIndexFile(const std::string &filePath, const HttpReques
                 return (createErrorResponse(403, req, config));
             mimeType = getMimeType(indexPath);
             return (createSuccessResponse(content, mimeType));
+        }
+    }
+    if (location && location->autoindex)
+    {
+        content = generateAutoindex(filePath, req.uri);
+        if (!content.empty())
+        {
+            response.statusCode = 200;
+            response.statusMessage = "OK";
+            response.body = content;
+            std::ostringstream oss;
+            oss << content.length();
+            response.headers["Content-Length"] = oss.str();
+            response.headers["Content-Type"] = "text/html";
+            return (response);
         }
     }
     return (createErrorResponse(404, req, config));
