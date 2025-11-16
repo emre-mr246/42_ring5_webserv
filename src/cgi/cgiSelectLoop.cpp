@@ -6,93 +6,88 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/15 12:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/16 12:49:45 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/16 13:52:00 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "http.hpp"
 #include "webserv.hpp"
 #include <signal.h>
-#include <sys/select.h>
 #include <unistd.h>
 
-static int handleSelectTimeout(int &timeoutCount, int &totalMs, pid_t pid)
+static int checkTimeoutElapsed(unsigned long &elapsedMs, pid_t pid)
 {
-    timeoutCount++;
-    totalMs += 1;
-    if (totalMs > CGI_TIMEOUT * 1000)
+    long delayCounter;
+
+    elapsedMs += 10;
+    if (elapsedMs >= (unsigned long)CGI_TIMEOUT)
     {
         kill(pid, SIGTERM);
-        usleep(50000);
+        delayCounter = 0;
+        while (delayCounter < CGI_DELAY_SIGTERM)
+            delayCounter++;
         kill(pid, SIGKILL);
         return (1);
     }
-    if (timeoutCount > 100)
-        return (1);
-    return (0);
 }
 
-static void resetTimeoutIfDataReceived(int selectResult, int &timeoutCount)
+static void writeToChildProcess(CgiSelectState &state)
 {
-    if (selectResult > 0)
-        timeoutCount = 0;
-}
+    size_t remaining;
+    ssize_t bytesWritten;
 
-static void setupSelectFds(fd_set &readSet, fd_set &writeSet, CgiSelectState &state,
-                           int &maxFd)
-{
-    FD_ZERO(&readSet);
-    FD_ZERO(&writeSet);
-    FD_SET(state.outputFd, &readSet);
-    maxFd = state.outputFd;
     if (!state.inputDone && state.totalWritten < state.bodyData->length())
     {
-        FD_SET(state.inputFd, &writeSet);
-        if (state.inputFd > maxFd)
-            maxFd = state.inputFd;
+        remaining = state.bodyData->length() - state.totalWritten;
+        if (remaining > CGI_BUFFER_SIZE)
+            remaining = CGI_BUFFER_SIZE;
+        bytesWritten = write(state.inputFd, state.bodyData->c_str() + state.totalWritten, remaining);
+        if (bytesWritten > 0)
+            state.totalWritten += bytesWritten;
+        if (state.totalWritten >= state.bodyData->length())
+        {
+            close(state.inputFd);
+            state.inputDone = 1;
+        }
     }
 }
 
-static int processSelectEvents(fd_set &readSet, fd_set &writeSet, CgiSelectState &state)
+static int readFromChildProcess(CgiSelectState &state)
 {
-    return (cgiIOProcessSelectEvents(readSet, writeSet, state));
+    char buffer[4096];
+    ssize_t bytesRead;
+
+    bytesRead = read(state.outputFd, buffer, sizeof(buffer));
+    if (bytesRead > 0 && state.output->length() + bytesRead <= CGI_OUTPUT_MAX_SIZE)
+        state.output->append(buffer, bytesRead);
+    if (bytesRead == 0 && state.inputDone)
+        return (0);
+    return (1);
 }
 
-static void runCgiSelectLoop(CgiSelectState &state, pid_t pid)
+static void runCgiLoop(CgiSelectState &state, pid_t pid)
 {
-    fd_set readSet;
-    fd_set writeSet;
-    int maxFd;
-    timeval timeout;
-    int selectResult;
-    int timeoutCount;
-    int totalMs;
+    unsigned long elapsedMs;
+    unsigned long iterCount;
 
-    timeoutCount = 0;
-    totalMs = 0;
+    elapsedMs = 0;
+    iterCount = 0;
     while (1)
     {
-        setupSelectFds(readSet, writeSet, state, maxFd);
-        timeout.tv_sec = 0;
-        timeout.tv_usec = SELECT_TIMEOUT_USEC;
-        selectResult = select(maxFd + 1, &readSet, &writeSet, NULL, &timeout);
-        if (selectResult < 0)
+        writeToChildProcess(state);
+        if (!readFromChildProcess(state))
             break;
-        if (selectResult == 0)
+        iterCount++;
+        if (iterCount >= 10000)
         {
-            if (handleSelectTimeout(timeoutCount, totalMs, pid))
+            if (checkTimeoutElapsed(elapsedMs, pid))
                 break;
-        }
-        else
-        {
-            resetTimeoutIfDataReceived(selectResult, timeoutCount);
-            if (!processSelectEvents(readSet, writeSet, state))
-                break;
+            iterCount = 0;
         }
     }
 }
 
 void cgiSelectRun(CgiSelectState &state, pid_t pid)
 {
-    runCgiSelectLoop(state, pid);
+    runCgiLoop(state, pid);
 }

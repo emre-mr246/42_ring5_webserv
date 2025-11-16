@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 10:51:54 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/16 12:49:46 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/16 13:52:01 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,8 @@ struct HttpResponse;
 #define CGI_CHUNK_SIZE 16777216
 #define CGI_BUFFER_SIZE 8388608
 #define CGI_OUTPUT_MAX_SIZE 134217728
+#define CGI_DELAY_SIGTERM 500000
+#define CGI_DELAY_POLLING 100000
 #define FILE_READ_BUFFER_SIZE 262144
 #define BUFFER_RESERVE_SIZE 8192
 #define SELECT_TIMEOUT_USEC 1000
