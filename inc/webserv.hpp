@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 10:51:54 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/15 19:20:47 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/16 12:49:46 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,9 @@ struct HttpResponse;
 #define CGI_BUFFER_SIZE 8388608
 #define CGI_OUTPUT_MAX_SIZE 134217728
 #define FILE_READ_BUFFER_SIZE 262144
-#define SELECT_TIMEOUT_USEC 100
-#define POLL_TIMEOUT_MSEC 5
+#define BUFFER_RESERVE_SIZE 8192
+#define SELECT_TIMEOUT_USEC 1000
+#define POLL_TIMEOUT_MSEC 10
 
 typedef struct sockaddr_in sockaddr_in;
 typedef struct sockaddr sockaddr;

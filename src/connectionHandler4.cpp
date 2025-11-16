@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 08:12:22 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/15 19:20:47 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/16 12:49:45 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,9 +67,13 @@ HttpResponse routeRequest(const HttpRequest &req, const Config *config)
 {
     HttpResponse response;
     HttpRequest headAsGet;
+    const ServerConfig *server;
 
     if (!validateHttpRequest(req))
         return (createErrorResponse(400));
+    server = findServerForRequest(req, config);
+    if (checkLocationRedirect(req, server, response))
+        return (response);
     if (!isMethodAllowed(req, config))
         return (handleMethodNotAllowed(req, config));
     if (req.method == "HEAD")

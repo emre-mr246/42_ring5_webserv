@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 19:48:09 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/15 19:20:47 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/16 12:49:45 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,12 +56,12 @@ int handleClientWrite(std::vector<pollfd> &pollFds, size_t i)
     int status;
 
     clientFd = pollFds[i].fd;
-    if (!hasPendingResponse(clientFd))
+    status = sendPendingResponse(clientFd);
+    if (!status)
     {
         updateClientEvents(pollFds, clientFd, POLLIN);
         return (1);
     }
-    status = sendPendingResponse(clientFd);
     if (status == 0)
         return (handleSendComplete(clientFd, pollFds, i));
     if (status == 2)

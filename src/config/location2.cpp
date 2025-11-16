@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 14:49:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/15 19:20:47 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/16 12:49:45 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,4 +69,31 @@ void addCgiPass(const std::string &line, LocationConfig &location)
     path = strtrim(value.substr(spacePos + 1));
     if (!ext.empty() && !path.empty())
         location.cgiPass[ext] = path;
+}
+
+void parseRedirectDirective(const std::string &line, LocationConfig &location)
+{
+    std::string value;
+    std::string codeStr;
+    std::string urlStr;
+    size_t pos;
+    size_t spacePos;
+
+    pos = line.find("return");
+    if (pos == std::string::npos)
+        return;
+    value = strtrim(line.substr(pos + 6));
+    if (!value.empty() && value[value.length() - 1] == ';')
+        value.resize(value.length() - 1);
+    value = strtrim(value);
+    spacePos = value.find(' ');
+    if (spacePos == std::string::npos)
+        return;
+    codeStr = value.substr(0, spacePos);
+    urlStr = strtrim(value.substr(spacePos + 1));
+    if (!codeStr.empty() && !urlStr.empty())
+    {
+        location.redirectCode = parsePort(codeStr);
+        location.redirectUrl = urlStr;
+    }
 }

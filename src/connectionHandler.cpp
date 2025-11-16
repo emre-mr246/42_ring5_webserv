@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 08:12:19 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/15 19:20:47 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/16 12:49:45 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,11 +84,11 @@ static int handleClientDataHelper(int clientFd, std::vector<pollfd> &pollFds,
 
     clientBuffer = &getClientBuffer(clientFd);
     clientBuffer->append(buf, bytesRead);
-    if (!wasHeadersParsed && areHeadersParsed(clientFd))
+    if (!wasHeadersParsed)
     {
         contentLength = parseContentLength(*clientBuffer);
         if (contentLength > 0 && contentLength < MAX_REQUEST_BUFFER)
-            clientBuffer->reserve(contentLength + 8192);
+            clientBuffer->reserve(contentLength + BUFFER_RESERVE_SIZE);
     }
     return (processNewData(clientFd, pollFds, config, wasHeadersParsed));
 }

@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/01 12:00:00 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/15 19:20:47 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/16 12:49:45 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ int processNewData(int clientFd, std::vector<pollfd> &pollFds, const Config *con
     clientBuffer = &getClientBuffer(clientFd);
     if (clientBuffer->length() > MAX_REQUEST_BUFFER)
         return (handleBufferOverflow(clientFd, pollFds));
-    if (!wasHeadersParsed && areHeadersParsed(clientFd))
+    if (!wasHeadersParsed)
     {
         checkHeadersForBodySize(clientFd, pollFds, config, &shouldContinue);
         if (!shouldContinue)

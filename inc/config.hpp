@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/13 21:32:43 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/15 19:20:47 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/16 12:49:46 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ struct LocationConfig
     std::map<std::string, std::string> cgiPass;
     std::map<int, std::string> errorPages;
     bool autoindex;
+    std::string redirectUrl;
+    int redirectCode;
 };
 
 struct ServerConfig
@@ -99,3 +101,4 @@ void addCgiPass(const std::string &line, LocationConfig &location);
 std::vector<std::string> extractServerNames(const std::string &line);
 int validateServerConfig(const ServerConfig &server);
 int validateAllServers(const std::vector<ServerConfig> &servers);
+void parseRedirectDirective(const std::string &line, LocationConfig &location);

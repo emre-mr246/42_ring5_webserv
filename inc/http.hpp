@@ -6,7 +6,7 @@
 /*   By: emgul <emgul@student.42istanbul.com.tr>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 21:29:36 by emgul            #+#    #+#              */
-/*   Updated: 2025/11/15 19:20:47 by emgul            ###   ########.fr       */
+/*   Updated: 2025/11/16 12:49:46 by emgul            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,3 +135,8 @@ int cgiIOProcessSelectEvents(fd_set &readSet, fd_set &writeSet, CgiSelectState &
 std::string cgiIOHandleWithSelect(int inputFd, int outputFd, pid_t pid,
                                   const std::string &bodyData, int &status);
 void cgiSelectRun(CgiSelectState &state, pid_t pid);
+const LocationConfig *findLocationForPath(const std::string &path,
+                                          const ServerConfig *server);
+HttpResponse createRedirectResponse(const LocationConfig *location);
+int checkLocationRedirect(const HttpRequest &req, const ServerConfig *server,
+                          HttpResponse &response);

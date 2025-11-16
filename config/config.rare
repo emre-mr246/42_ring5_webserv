@@ -60,6 +60,10 @@ server {
 		accepted_methods GET;
 		index index.html;
     }
+	location /old_page
+	{
+		return 301 /;
+    }
 	location /post_body
 	{
         client_max_body_size 100;
